@@ -3,6 +3,7 @@
     bottom: 0;
     right: 50px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 
 .collapsible {
@@ -79,6 +80,10 @@
 
 #chat-icon:hover {
     opacity: .7;
+    z-index: 1000;
+}
+#chat-icon {
+    z-index: 1000;
 }
 
 /* Chat bubbles */
