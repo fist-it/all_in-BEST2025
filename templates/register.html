@@ -6,17 +6,19 @@
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="/templates/styles/login.css">
     <div class="slider-background">
         <div class="slide" id="slide-1"></div>
         <div class="slide" id="slide-2"></div>
         <div class="slide" id="slide-3"></div>
         <div class="slide" id="slide-4"></div>
     </div>
-    
+<div class="log">
     <div class="overlay"></div>
 
     <div class="log-container">
         <div class="log">
+            <img src="../static/images/gdansk_logo.webp" alt="Gdansk City Logo" width="25" height="30">
             <h2>WITAMY W MAPIE GDAŃSKA!</h2>
             <h3>REJSTRACJA</h3>
             
@@ -27,20 +29,19 @@
             <form method="POST">
                 <div class="form-group">
                     <i class="material-icons">account_circle</i>
-                    <label for="username">Nazwa użytkownika</label>
                     <input type="text" class="form-control" id="username" name="username" required>
                 </div>
                 <div class="form-group">
                     <i class="material-icons">lock</i>
-                    <label for="password">Hasło</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <button type="submit" class="button">Zarejestruj się</button>
+                <p class="mt-4">
+                    Masz już konto? <a href="{{ url_for('login') }}" class="linki">Zaloguj się!</a>
+                </p>
             </form>
-            <p class="mt-4">
-                Masz już konto? <a href="{{ url_for('login') }}">Zaloguj się!</a>
-            </p>
         </div>
+    </div>
     </div>
 
     <script>

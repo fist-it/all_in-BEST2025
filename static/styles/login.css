@@ -2,6 +2,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .slider-background {
@@ -62,7 +63,7 @@ html, body {
     max-width: 380px;
     width: 90%;
     padding: 30px;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.85);
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -109,6 +110,8 @@ html, body {
 
 .mt-4{
     color: #212a53;
+    position: fixed;
+    width: 100%;
 }
 
 .button {
@@ -127,24 +130,25 @@ html, body {
     background-color: #212a53;
 }
 
-log a:link {
-    color:#3d6483;
-    text-decoration:none;
-    transition: color 300ms ease;
-}
-
-log a:visited {
-    color:#98c9bd;
-    text-decoration:none;
-}
-
-log a:hover {
-    color:#212a53;
-    text-decoration:none;
-}
-
 .material-icons{
-    left: 0;
     color: #90876c;
+}
 
+form {
+	min-height:345px;
+	position:relative;
+	perspective:1000px;
+	transform-style:preserve-3d;
+}
+
+#username {
+    color: #212a53;
+}
+
+.linki {
+    color: #3d6483;
+}
+
+.linki:hover{
+    color: #212a53;
 }
