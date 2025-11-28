@@ -29,10 +29,11 @@
 
             <form method="POST" action="{{ url_for('login') }}">
                 <i class="material-icons">account_circle</i>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" placeholder="Nazwa Użytkownika" required>
+                <br> 
                 <i class="material-icons">lock</i>
-                <input type="password" id="password" name="password" required>
-
+                <input type="password" id="password" name="password" placeholder="Hasło" required>
+                
                 <button type="submit" class="button">Zaloguj</button>
                 <p class="mt-4">
                     Nie masz konta? <a href="{{ url_for('register') }}" class="linki">Zarejestruj się!</a>

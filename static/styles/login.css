@@ -132,6 +132,9 @@ html, body {
 
 .material-icons{
     color: #90876c;
+    position: relative;
+    top: 6px;
+    right: 6px;
 }
 
 form {
@@ -143,6 +146,12 @@ form {
 
 #username {
     color: #212a53;
+    width: 80%;
+}
+
+#password {
+    color: #212a53;
+    width: 80%;
 }
 
 .linki {
