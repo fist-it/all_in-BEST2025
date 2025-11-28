@@ -13,8 +13,31 @@ async function fetchEvents() {
 };
 
 var events = fetchEvents();
+async function fetchEvents() {
+  const response = await fetch('/static/data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json');
+  const data = await response.json();
+  return data;
+}
 
+var events = fetchEvents();
+
+events.then(data => {
+  data = data.entries();
+  console.log(data)
+  events_grouped = [];
+  data.forEach(item => {
+    var event = item[1]
+    var popupContent = `<div id="popup">
+      <img src="${event.imageUrl}" alt="Event Image" width="100%">
+      <b>${event.name}</b>
+      <br>Uczestnicy: ${event.usersGoing}<br>
+      <a href="${event.url}" target="_blank">Link do wydarzenia</a>
+      </div>`;
+    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+  })
+}); 
 // L.Shapefile('/static/data/dzielnice.zip').addTo(map);
+
 
 events.then(data => {
   data = data.entries();
@@ -123,21 +146,25 @@ document.getElementById('addEventForm').addEventListener('submit', function(e) {
     });
 });
 
+
+
 function createMarker(event) {
     if (!event.latitude || !event.longitude) return;
 
     var marker;
 
-    if (event.event_type === 'live') {
+    var type = event.event_type || 'static'; 
+
+    if (type === 'live') {
         var customIcon = L.divIcon({
             className: 'pulsating-circle',
-            html: `<div class="pulsating-circle"></div>`,
+            html: `<div></div>`,
             iconSize: [20, 20],
-            iconAnchor: [10, 10]
+            iconAnchor: [10, 10]  
         });
         marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
     } else {
-      var customIcon = L.divIcon({
+        var customIcon = L.divIcon({
             className: 'custom-icon-container',
             html: `<div class="static-marker"></div>`,
             iconSize: [20, 20],
@@ -145,9 +172,8 @@ function createMarker(event) {
         });
         marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
     }
-
+        
     var deleteButtonHtml = '';
-
     if (event.is_mine) {
         deleteButtonHtml = `
             <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
@@ -189,7 +215,7 @@ function searchNearby() {
 
     var lat = selectedCoords.lat;
     var lng = selectedCoords.lng;
-    var radius = 1000; // 1000 metrów (1km)
+    var radius = 1000; // 1000 metrów
 
     markersLayer.clearLayers();
 
@@ -227,73 +253,16 @@ function copyCoords() {
 }
 
 function updateMap() {
-  
     console.log("Odświeżam mapę...");
     
-    fetch('/api/events/user')
+    fetch('/api/events/user') 
         .then(response => response.json())
         .then(events => {
+            allEvents = events; 
             markersLayer.clearLayers();
 
             events.forEach(event => {
-                console.log(event);
-                if (!event.latitude || !event.longitude) return;
-
-                var marker;
-
-                if (event.event_type === 'live') {
-                    var customIcon = L.divIcon({
-                        className: 'pulsating-circle',
-                        html: `<div class="pulsating-circle"></div>`,
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-                    marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-                } else {
-                  var customIcon = L.divIcon({
-                        className: 'custom-icon-container',
-                        html: `<div class="static-marker"></div>`,
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-                    marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-                }
-
-                var deleteButtonHtml = '';
-
-                if (event.is_mine) {
-                    deleteButtonHtml = `
-                        <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
-                            <button onclick="deleteEvent(${event.id})" 
-                                    style="background:none; border:none; color:red; cursor:pointer; font-size:11px; text-decoration:underline;">
-                                🗑️ Usuń moje zgłoszenie
-                            </button>
-                        </div>
-                    `;
-                }
-
-                var popupContent = `
-                    <div style="text-align:center; min-width:160px;">
-                        <strong style="font-size:14px;">${event.name}</strong><br>
-                        <span style="color:gray; font-size:11px;">${event['location.name']}</span>
-                        <hr style="margin:5px 0;">
-                        
-                        <div style="margin-bottom:5px;">
-                            Głosów: <b id="vote-count-${event.id}">${event.upvoteCount || 0}</b>
-                        </div>
-                        
-                        <div>
-                            <button onclick="vote(${event.id}, 'up')" style="cursor:pointer; background:#d4edda; border:1px solid #c3e6cb; padding:2px 8px; border-radius:4px;">👍</button>
-                            <button onclick="vote(${event.id}, 'down')" style="cursor:pointer; background:#f8d7da; border:1px solid #f5c6cb; padding:2px 8px; border-radius:4px;">👎</button>
-                        </div>
-
-                        ${deleteButtonHtml}
-                    </div>
-                `;
-
-                marker.bindPopup(popupContent);
-                
-                markersLayer.addLayer(marker);
+                createMarker(event);
             });
         })
         .catch(err => console.error("Błąd pobierania eventów:", err));
