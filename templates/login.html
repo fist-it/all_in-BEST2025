@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Logowanie{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/styles/login.css" />
+<div class="log">
+    <h2>Zaloguj się</h2>
+    
+    {% if error %}
+        <p class="flash-message">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+        <label for="username">Nazwa użytkownika:</label><br>
+        <input type="text" id="username" name="username" required style="width: 100%; padding: 8px; margin: 10px 0;"><br>
+
+        <label for="password">Hasło:</label><br>
+        <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; margin: 10px 0;"><br>
+
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Zaloguj</button>
+    </form>
+</div>
+{% endblock %}

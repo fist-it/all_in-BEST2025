@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Rejestracja{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Rejestracja Nowego Konta</h2>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">Nazwa użytkownika</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Hasło</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Zarejestruj się</button>
+            </form>
+            <p class="text-center mt-3">
+                Masz już konto? <a href="{{ url_for('login') }}">Zaloguj się!</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
