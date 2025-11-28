@@ -103,7 +103,7 @@ def index():
 #==
 
 @app.route('/api/events/fb')
-# @login_required - Disabled for API development
+# @login_required # - Disabled for API development
 def api_events_fb():
     EVENTS_FILE = "data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json"
     try:
@@ -125,7 +125,7 @@ def api_events_fb():
         return jsonify({})
 
 @app.route('/api/events/user')
-# @login_required - Disabled for API development
+# @login_required # - Disabled for API development
 def api_events_user():
     db_events = Event.query.all()
     output_list = []
@@ -154,7 +154,7 @@ def api_events_user():
 #API: Reports CRUD
 #==
 
-# @login_required - Disabled for API development
+# @login_required # - Disabled for API development
 # przykładowe dane tak +-:
 #   {
 #       "category": "live"/"static",
@@ -235,14 +235,30 @@ def add_event():
 
     return redirect(url_for('index'))
 
-@app.route('/delete_event/<int:event_id>')
-# @login_required - Disabled for API development
+@app.route('/api/delete_event/<int:event_id>', methods=['DELETE'])
+@login_required
 def delete_event(event_id):
     event = db.session.get(Event, event_id)
-    if event and event.author == current_user:
-        db.session.delete(event)
-        db.session.commit()
-    return redirect(url_for('my_events'))
+    
+    if not event:
+        print("BŁĄD: Nie znaleziono eventu o tym ID")
+        return jsonify({'error': 'Event not found'}), 404
+
+    print(f"DEBUG: Event ID: {event.id}, Owner ID: {event.user_id}, Current User ID: {current_user.id}")
+
+    if event.user_id == current_user.id:
+        try:
+            db.session.delete(event)
+            db.session.commit()
+            print("SUKCES: Usunięto z bazy")
+            return jsonify({'message': 'Deleted successfully'}), 200
+        except Exception as e:
+            db.session.rollback()
+            print(f"BŁĄD BAZY: {e}")
+            return jsonify({'error': str(e)}), 500
+    else:
+        print("BŁĄD: Brak uprawnień (to nie Twój event)")
+        return jsonify({'error': 'Unauthorized'}), 403
 
 @app.route('/api/vote', methods=['POST'])
 def vote_event():
@@ -266,12 +282,12 @@ def vote_event():
     db.session.add(new_vote)
 
     if event.event_type == 'live':        
-        now = datetime.now(UTC) # Poprawione na timezone-aware
+        now = datetime.now(UTC) # timezone aware
         hard_cap = now + MAX_FUTURE_VISIBILITY
 
         if vote_type == 'up':
             event.upvote_count += 1
-            if event.end_date.replace(tzinfo=UTC) < now: # Upewnij się co do stref czasowych
+            if event.end_date.replace(tzinfo=UTC) < now: # strefy czasowe fix
                 event.end_date = now + TIME_EXTENSION
             else:
                 proposed_end_date = event.end_date.replace(tzinfo=UTC) + TIME_EXTENSION
@@ -306,7 +322,7 @@ def vote_event():
     })
 
 @app.route('/api/events', methods=['GET'])
-# @login_required - Disabled for API development
+# @login_required # - Disabled for API development
 def api_events():
     all_events = []
 
