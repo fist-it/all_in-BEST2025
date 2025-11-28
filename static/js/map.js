@@ -13,16 +13,32 @@ async function fetchEvents() {
 
 var events = fetchEvents();
 
-// L.Shapefile('/static/data/dzielnice.zip').addTo(map);
+var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
+  onEachFeature: function(feature, layer) {
+    var holder = [];
+    for (var key in feature.properties) {
+      holder.push(key + ": " + feature.properties[key] + "<br>");
+      popupContent = holder.join("");
+      layer.bindPopup(popupContent); // DO KLIKNIECIA
+    };
+    console.log("adding to map")
+    dzielnice.addTo(map);
+  },
+  style: function(feature) {
+    return {
+      color: "#29526E",
+      fillColor: "#82CDAF",
+      fillOpacity: 0.5,
+    }
+  },
+});
+
 
 events.then(data => {
   data = data.entries();
-  console.log(data)
-
   events_grouped = [];
   data.forEach(item => {
     var event = item[1]
-    console.log(event.latitude);
     var popupContent = `<div id="popup">
       <img src="${event.imageUrl}" alt="Event Image" width="100%">
       <b>${event.name}</b>
