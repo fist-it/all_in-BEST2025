@@ -1,6 +1,26 @@
 const map = L.map('map').setView([54.4000, 18.5000], 11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
+  maxZoom: 19,
+  attribution: '© OpenStreetMap contributors'
 }).addTo(map);
+
+async function fetchEvents() {
+  const response = await fetch('/static/data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json');
+  const data = await response.json();
+  return data;
+};
+
+var events = fetchEvents();
+
+events.then(data => {
+  data = data.entries();
+  console.log(data)
+
+  data.forEach(item => {
+    var event = item[1]
+    console.log(event.latitude);
+    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup("test");
+  })
+});
+
