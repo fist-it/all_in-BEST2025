@@ -5,15 +5,19 @@
 
     <!-- Wysuwane okienko -->
     <div id="sidePanel" class="panel">
-        <button id="closePanel" class="close-btn">&times;</button>
-        <!--  current_user.username  -->
-      <h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2>
+        <ul>
+            <div class="MenuHead">
+                <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
+
+      <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
+            </div>
         <p>Tu możesz umieścić dowolną treść: tekst, obrazki, formularze...</p>
+      </ul>
     </div>
 
      <!-- CHAT BAR BLOCK -->
     <div class="chat-bar-collapsible">
-        <button id="chat-button" type="button" class="collapsible">Chat with us!
+        <button id="chat-button" type="button" class="collapsible">Twój asystent AI!
             <i id="chat-icon" style="color: #fff;" class="fa fa-fw fa-comments-o"></i>
         </button>
 
@@ -60,5 +64,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/static/js/responses.js"></script>
     <script src="/static/js/chat.js"></script>
+    <script>
+    $('.sidePanel').sliiide({place: 'left', toggle: '#close-btn'});
+    </script>
 </body>
 </html>

@@ -1,24 +1,29 @@
-/* styles.css */
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+    overflow: hidden;
+    height: 100%;
 }
 
 button {
-    background-color: #29526e;
+    background-color: #3d6483;
+    transition: background-color 300ms ease;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 10px;
     cursor: pointer;
     border-radius: 5px;
     margin: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:hover {
-    background-color: #171f40;
+    background-color: #212a53;
 }
 
 /* Wysuwane okienko */
@@ -36,14 +41,13 @@ button:hover {
     z-index: 1000;
 }
 
-
-
 /* Gdy okienko jest otwarte */
 .panel.open {
     left: 0;
 }
 
 .close-btn {
+    background-color: #3d6483;
     position: absolute;
     top: 5px;
     right: 10px;
@@ -53,11 +57,13 @@ button:hover {
     cursor: pointer;
 }
 
-.close-btn:hover {
-    color: #7f745b;
+#closePanel{
+    background-color: #3d6483;
+    transition: left 0.3s ease-in-out;
 }
-
-
+#closePanel:hover{
+    background-color: #212a53;
+}
 
 .flash-message {
 padding: 10px;
@@ -67,29 +73,35 @@ text-align: center;
 }
 
 .menu {
-background-color: #82c0af;
+background-color: rgba(255, 255, 255, 0.85);
 display: flex;
+width: 100%;
+position: absolute;
 justify-content: center;
 list-style: none;
 padding: 0px;
 margin: 0;
+z-index: 1000;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 }
 .menu li {
   float: left;
   margin: 0 20px;
 }
 .menu a {
-   background-color: #29526e;
+    background-color: #979899;
+    transition: background-color 300ms ease;
     color: #fff;
     border: 5px;
     margin: 5px;
     padding: 0px 0px;
-
     cursor: pointer;
 }
 
 .nav-link{
-    background-color: #29526e;
+    background-color: #3d6483;
+    transition: background-color 300ms ease;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -111,17 +123,27 @@ margin: 0;
     margin: 20px;
     position: absolute;
     right: 15px;
+    top: -10px;
 }
 #link2{
-    background-color: #29526e;
-    color: #fff;
+    color:#90876c;
     border: none;
     padding: 10px 20px;
-    cursor: pointer;
     border-radius: 5px;
     margin: 20px;
     position: absolute;
-    right: 150px;
+    right: 80px;
+    top: -5px;
+}
+
+#link1:hover{
+ background-color: #212a53;
+}
+
+#userMenu{
+    position: absolute;
+    left: 15px;
+    top: -8px;
 }
 
 .leaflet-popup-content-wrapper {
@@ -136,3 +158,34 @@ margin: 0;
 /*     padding: 5px; */
 /*     z-index: 1001; */
 /* } */
+#userMenu ul {
+      list-style: none;
+      text-align: center;
+      padding: 0px;
+  }
+
+  #userMenu li {
+      margin: 30px auto;
+  }
+
+  #userMenu ul li a {
+      font-weight: 100;
+      font-size: 16px;
+      color: #082213;
+      text-decoration: none;
+      margin: 0px 15px;
+      text-transform: uppercase;
+  }
+
+  #userMenu ul li a:hover {
+      color: #fff;
+  }
+
+  #sidePanel{
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  #openPanel{
+    position: relative;
+    top: -2px;
+  }

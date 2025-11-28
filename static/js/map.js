@@ -33,3 +33,4 @@ events.then(data => {
   })
 });
 
+map.removeControl(map.zoomControl);
