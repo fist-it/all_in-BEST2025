@@ -1,13 +1,13 @@
 
 <body>
     <!-- Przycisk do otwierania okienka -->
-    <button id="openPanel">Otwórz panel użytkownika</button>
+    <button id="openPanel"><i class="material-icons">home</i></button>
 
     <!-- Wysuwane okienko -->
     <div id="sidePanel" class="panel">
         <button id="closePanel" class="close-btn">&times;</button>
         <!--  current_user.username  -->
-      <h2>Cześć, Franek, to jest twój panel użytkownika!</h2>
+      <h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2>
         <p>Tu możesz umieścić dowolną treść: tekst, obrazki, formularze...</p>
     </div>
 
@@ -60,6 +60,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/static/js/responses.js"></script>
-    q<script src="/static/js/chat.js"></script>
+    <script src="/static/js/chat.js"></script>
 </body>
 </html>

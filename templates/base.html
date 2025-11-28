@@ -5,37 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Smart City Panel{% endblock %}</title>
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/static/styles/styles.css">
-    <link rel="stylesheet" href="/static/styles/chat.css">
-    <link rel="stylesheet" href="/static/styles/home.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/styles.css" >
+    <link rel="stylesheet" type="text/css" href="/static/styles/chat.css" >
+    <link rel="stylesheet" type="text/css" href="/static/styles/home.css" >
+    <link rel="stylesheet" href="/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
         body { margin: 0; font-family: sans-serif; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="{{ url_for('index') }}">MAPA</a>
+    <nav class="navbar">
+        <ul class="menu">
+            <div style="position: absolute ;left: 15px" >
+       <li><a>{% include 'menu.html' %}</a></li>
+                  </div>
         <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
+
+                <li><h2>BEST2025</h2></li>
+
+
                 {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <span class="nav-link">Witaj, {{ current_user.username }}</span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout') }}">Wyloguj</a>
-                </li>
+                    <li><span class="nav-link" id="link1">Witaj, {{ current_user.username }}</span></li>
+                    <li><a class="nav-link" href="{{ url_for('logout') }}" id="link2">Wyloguj</a></li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login') }}">Zaloguj</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('register') }}">Zarejestruj</a>
-                </li>
+                    <li><a class="nav-link" href="{{ url_for('login') }}" id="link1">Zaloguj</a></li>
+                    <li><a class="nav-link" href="{{ url_for('register') }}" id="link2">Zarejestruj</a></li>
                 {% endif %}
-            </ul>
         </div>
+        </ul>
     </nav>
     <div class="container-fluid">
         {% block content %}{% endblock %}
