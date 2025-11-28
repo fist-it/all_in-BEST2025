@@ -8,10 +8,14 @@
         <ul>
             <div class="MenuHead">
                 <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
-
-      <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
+                <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
             </div>
-        <p>Tu możesz umieścić dowolną treść: tekst, obrazki, formularze...</p>
+            <p>Wybierz jaka chcesz mape:</p>
+            <input type="checkbox" id="cb1" onclick="fuction1()"> 1 <br>
+            <input type="checkbox" id="cb2" onclick="fuction2()"> 2 <br>
+            <input type="checkbox" id="cb3" onclick="fuction3()"> 3 <br>
+            <input type="checkbox" id="cb4" onclick="fuction4()"> 4 <br>
+            <input type="checkbox" id="cb5" onclick="fuction5()"> 5 <br>
       </ul>
     </div>
 
