@@ -10,13 +10,6 @@ async function fetchEvents() {
   const response = await fetch('/static/data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json');
   const data = await response.json();
   return data;
-};
-
-var events = fetchEvents();
-async function fetchEvents() {
-  const response = await fetch('/static/data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json');
-  const data = await response.json();
-  return data;
 }
 
 var events = fetchEvents();
@@ -239,6 +232,7 @@ function searchNearby() {
         fillColor: '#007bff',
         fillOpacity: 0.1
     });
+    resetButton.addTo(map);
     markersLayer.addLayer(circle);
 
     map.fitBounds(circle.getBounds());
@@ -316,4 +310,18 @@ function deleteEvent(eventId) {
         console.error("Błąd sieci:", err);
         alert("Wystąpił błąd połączenia.");
     });
+}
+
+var resetButton = L.control({position: 'bottomleft'});
+
+resetButton.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'reset-btn-container');
+    div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
+    return div;
+};
+
+function resetSearch() {
+    resetButton.remove();
+  
+    updateMap();
 }
