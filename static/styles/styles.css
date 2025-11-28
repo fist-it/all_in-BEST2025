@@ -123,3 +123,16 @@ margin: 0;
     position: absolute;
     right: 150px;
 }
+
+.leaflet-popup-content-wrapper {
+    /* position: inherit; */
+    background-color: #f4f4f4;
+    padding: 5px;
+    z-index: 1001;
+}
+/* #popup { */
+/*     position: inherit; */
+/*     background-color: #f4f4f4; */
+/*     padding: 5px; */
+/*     z-index: 1001; */
+/* } */

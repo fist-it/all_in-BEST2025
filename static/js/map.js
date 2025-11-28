@@ -13,14 +13,23 @@ async function fetchEvents() {
 
 var events = fetchEvents();
 
+// L.Shapefile('/static/data/dzielnice.zip').addTo(map);
+
 events.then(data => {
   data = data.entries();
   console.log(data)
 
+  events_grouped = [];
   data.forEach(item => {
     var event = item[1]
     console.log(event.latitude);
-    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup("test");
+    var popupContent = `<div id="popup">
+      <img src="${event.imageUrl}" alt="Event Image" width="100%">
+      <b>${event.name}</b>
+      <br>Uczestnicy: ${event.usersGoing}<br>
+      <a href="${event.url}" target="_blank">Link do wydarzenia</a>
+      </div>`;
+    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
   })
 });
 
