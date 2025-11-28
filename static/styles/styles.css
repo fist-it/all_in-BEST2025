@@ -146,6 +146,18 @@ z-index: 1000;
     top: -8px;
 }
 
+.leaflet-popup-content-wrapper {
+    /* position: inherit; */
+    background-color: #f4f4f4;
+    padding: 5px;
+    z-index: 1001;
+}
+/* #popup { */
+/*     position: inherit; */
+/*     background-color: #f4f4f4; */
+/*     padding: 5px; */
+/*     z-index: 1001; */
+/* } */
 #userMenu ul {
       list-style: none;
       text-align: center;
