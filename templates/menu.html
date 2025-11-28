@@ -8,14 +8,35 @@
         <ul>
             <div class="MenuHead">
                 <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
-                <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
+                <li><h2>Cześć,      , to jest twój panel użytkownika!</h2></li>
             </div>
-            <p>Wybierz jaka chcesz mape:</p>
-            <input type="checkbox" id="cb1" onclick="fuction1()"> 1 <br>
-            <input type="checkbox" id="cb2" onclick="fuction2()"> 2 <br>
-            <input type="checkbox" id="cb3" onclick="fuction3()"> 3 <br>
-            <input type="checkbox" id="cb4" onclick="fuction4()"> 4 <br>
-            <input type="checkbox" id="cb5" onclick="fuction5()"> 5 <br>
+            
+            <h1>Checkboxes</h1>
+            <label class="container">One
+                <input type="checkbox" checked="checked" onclick="fuction1()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Two
+                <input type="checkbox" checked="checked" onclick="fuction2()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Three
+                <input type="checkbox" checked="checked" onclick="fuction3()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Four
+                <input type="checkbox" checked="checked" onclick="fuction4()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Five
+                <input type="checkbox" checked="checked" onclick="fuction5()">
+            <span class="checkmark"></span>
+            </label>
+
       </ul>
     </div>
 
