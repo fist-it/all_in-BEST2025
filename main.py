@@ -265,9 +265,8 @@ def delete_event(event_id):
         return jsonify({'error': 'Unauthorized'}), 403
 
 @app.route('/api/vote', methods=['POST'])
-# @login_required <-- Odkomentuj na produkcji
+# @login_required # - Disabled for API development
 def vote_event():
-    # 0. Sprawdzenie autoryzacji
     if not current_user.is_authenticated:
         return jsonify({'error': 'Musisz być zalogowany!'}), 401
 
@@ -279,19 +278,13 @@ def vote_event():
     if not event:
         return jsonify({'error': 'Event nie istnieje'}), 404
 
-    # 1. Sprawdzenie czy user już głosował (wymaga modelu Vote)
-    # from models import Vote
     existing_vote = Vote.query.filter_by(user_id=current_user.id, event_id=event_id).first()
     if existing_vote:
         return jsonify({'error': 'Już oddałeś głos na to zgłoszenie!'}), 400
 
-    # 2. Rejestracja głosu
     new_vote = Vote(user_id=current_user.id, event_id=event_id, vote_type=vote_type)
     db.session.add(new_vote)
 
-    # 3. LOGIKA BIZNESOWA (Live vs Static)
-    
-    # === SCENARIUSZ LIVE (Czas + Punkty) ===
     if event.event_type == 'live':
         from datetime import datetime, timezone
         now = datetime.now(timezone.utc)
@@ -299,7 +292,6 @@ def vote_event():
         # Obliczamy Hard Cap (np. max 3h od teraz)
         hard_cap = now + MAX_FUTURE_VISIBILITY 
 
-        # Upewniamy się, że daty w bazie mają strefę czasową (dla porównań)
         if event.end_date.tzinfo is None:
             event.end_date = event.end_date.replace(tzinfo=timezone.utc)
 
@@ -310,27 +302,23 @@ def vote_event():
             if event.end_date < now:
                 event.end_date = now + TIME_EXTENSION
             else:
-                # Przedłużamy, ale nie powyżej Hard Cap
                 proposed_end = event.end_date + TIME_EXTENSION
                 event.end_date = min(proposed_end, hard_cap)
 
         elif vote_type == 'down':
             event.upvote_count -= 1
-            # Skracamy czas
             event.end_date -= TIME_EXTENSION
             
-            # Jeśli dużo minusów -> koniec natychmiastowy
-            if event.upvote_count <= -5:
+            if event.upvote_count <= -1:
                 event.end_date = now
 
-    # === SCENARIUSZ STATIC (Tylko Punkty) ===
     else:
         if vote_type == 'up':
             event.upvote_count += 1
         elif vote_type == 'down':
             event.upvote_count -= 1
-            # Opcjonalnie: ukryj jeśli spadnie poniżej -10
-            # if event.upvote_count <= -10: db.session.delete(event)
+            if event.upvote_count <= -10:
+                db.session.delete(event)
 
     try:
         db.session.commit()
@@ -379,12 +367,10 @@ def delete_event_api(event_id):
     if not event:
         return jsonify({'error': 'Wydarzenie nie istnieje'}), 404
 
-    # tylko autor może usunąć
     if event.user_id != current_user.id:
         return jsonify({'error': 'Nie masz uprawnień do usunięcia tego zgłoszenia'}), 403
 
     try:
-        # Usuwamy też powiązane głosy (jeśli nie masz kaskadowego usuwania w bazie)
         Vote.query.filter_by(event_id=event.id).delete() 
         db.session.delete(event)
         db.session.commit()
