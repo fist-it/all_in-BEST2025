@@ -28,9 +28,17 @@
 
 
                 {% if current_user.is_authenticated %}
-                    <li><span class="nav-link" id="link1">Witaj, {{ current_user.username }}</span></li>
-                    <li><a class="nav-link" href="{{ url_for('logout') }}" id="link2">Wyloguj</a></li>
-                {% else %}
+                    <li>
+                        <a href="{{ url_for('logout') }}">
+                        <button class="nav-link" id="link1">
+                            <i class="material-icons">logout</i>
+                        </button>
+                        </a>
+                    </li>
+
+                    <li><span id="link2">Witaj, {{ current_user.username }}</span></li>                    
+
+                    {% else %}
                     <li><a class="nav-link" href="{{ url_for('login') }}" id="link1">Zaloguj</a></li>
                     <li><a class="nav-link" href="{{ url_for('register') }}" id="link2">Zarejestruj</a></li>
                 {% endif %}
