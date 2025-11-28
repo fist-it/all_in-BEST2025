@@ -3,6 +3,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 {% endblock %}
 
 {% block content %}
@@ -25,9 +26,11 @@
             {% endif %}
 
             <form method="POST" action="{{ url_for('login') }}">
+                <i class="material-icons">account_circle</i>
                 <label for="username">Nazwa użytkownika</label>
                 <input type="text" id="username" name="username" required>
 
+                <i class="material-icons">lock</i>
                 <label for="password">Hasło</label>
                 <input type="password" id="password" name="password" required>
 

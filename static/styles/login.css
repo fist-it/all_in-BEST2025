@@ -71,24 +71,23 @@ html, body {
 }
 
 .log h2{
-    color: mix(#fff, #e91e63, 85%);
-	font-size: 15px ;  
+    color:#494435;
+	font-size: 25px ;  
 	font-weight: 900;
-	text-shadow: 
-		-0.0075em 0.0075em 0 mix(#fff, #e91e63, 94%),
-		0.005em 0.005em 0 mix(#fff, #e91e63, 60%),
-		0.01em 0.01em 0 mix(#fff, #e91e63, 62%), 
-		0.015em 0.015em mix(#fff, #e91e63, 64%), 
-		0.02em 0.02em 0 mix(#fff, #e91e63, 66%), 
-		0.025em 0.025em 0 mix(#fff, #e91e63, 68%),
-		0.03em 0.03em 0 mix(#fff, #e91e63, 70%),
-		0.035em 0.035em 0 mix(#fff, #e91e63, 72%);
+    transition: color 300ms ease;
+}
+
+.log h2:hover{
+    color:#90876c;
+    
 }
 
 .log h3 {
-    color: #003169;
+    color: #90876c;
     margin-bottom: 20px;
+    font-size: 20px ;
     font-weight: bold;
+    transition: color 300ms ease;
 }
 
 .log label {
@@ -108,10 +107,14 @@ html, body {
     box-sizing: border-box;
 }
 
+.mt-4{
+    color: #212a53;
+}
+
 .button {
     width: 100%;
     padding: 12px;
-    background-color: #4CAF50;
+    background-color: #3d6483;
     color: white;
     border: none;
     cursor: pointer;
@@ -121,15 +124,27 @@ html, body {
 }
 
 .button:hover {
-    background-color: #45a049;
+    background-color: #212a53;
 }
 
-.log a {
-    color: #003169;
+log a:link {
+    color:#3d6483;
+    text-decoration:none;
     transition: color 300ms ease;
 }
 
-.log a:hover {
-    color: #4CAF50;
-    text-decoration: underline;
+log a:visited {
+    color:#98c9bd;
+    text-decoration:none;
+}
+
+log a:hover {
+    color:#212a53;
+    text-decoration:none;
+}
+
+.material-icons{
+    left: 0;
+    color: #90876c;
+
 }
