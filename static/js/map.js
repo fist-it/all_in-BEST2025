@@ -13,25 +13,50 @@ async function fetchEvents() {
 
 var events = fetchEvents();
 
+var layers = [];
+
 var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
   onEachFeature: function(feature, layer) {
     var holder = [];
-    for (var key in feature.properties) {
-      holder.push(key + ": " + feature.properties[key] + "<br>");
-      popupContent = holder.join("");
-      layer.bindPopup(popupContent); // DO KLIKNIECIA
-    };
-    console.log("adding to map")
-    dzielnice.addTo(map);
+    // for (var key in feature.properties) {
+    //   holder.push(key + ": " + feature.properties[key] + "<br>");
+    //   popupContent = holder.join("");
+    //   layer.bindPopup(popupContent); // DO KLIKNIECIA
+    // };
+    liczba_mieszkancow = feature.properties.L_MIESZK;
+    if (liczba_mieszkancow > 20000) {
+      layer.setStyle({fillColor: "#FF0000"});
+    } else if (liczba_mieszkancow > 15000) {
+      layer.setStyle({fillColor: "#FF7F00"});
+    } else if (liczba_mieszkancow > 10000) {
+      layer.setStyle({fillColor: "#FFFF00"});
+    } else if (liczba_mieszkancow > 5000) {
+      layer.setStyle({fillColor: "#7FFF00"});
+    } else {
+      layer.setStyle({fillColor: "#00FF00"});
+    }
+    liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: " + liczba_mieszkancow.toString() + "<br>";
+    if (liczba_mieszkancow == null) {
+      liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: Brak danych<br>";
+    }
+    if (liczba_mieszkancow == 0) {
+      liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: Brak danych<br>";
+    }
+      
+    popupContent = "<div id='popup'><b>Dzielnica:</b> " + feature.properties.DZIELNICY + liczba_mieszkancow_text + "</div>";
+
+    layer.bindPopup(popupContent); // DO KLIKNIECIA
+    layers.push(layer);
+    // console.log("adding to map")
   },
   style: function(feature) {
     return {
       color: "#29526E",
-      fillColor: "#82CDAF",
       fillOpacity: 0.5,
     }
   },
 });
+dzielnice.addTo(map);
 
 
 events.then(data => {
