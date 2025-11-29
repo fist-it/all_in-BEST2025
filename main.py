@@ -5,6 +5,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash # hashowanie
 from google import genai
+from pydantic import BaseModel, Field
+from typing import List, Optional
 from models import db, User, Event, Vote, get_user_by_username
 from geopy.geocoders import Nominatim
 import datetime
@@ -426,6 +428,58 @@ def handle_chat():
         )
 
         ai_response = response.text
+
+    except Exception as e:
+        ai_response = f"Błąd komunikacji z modelem AI: {e}"
+
+    return jsonify({"response": ai_response})
+
+
+@app.route('/api/chat_admin', methods=['POST'])
+@login_required
+def handle_chat_admin():
+    class Info(BaseModel):
+        Kultura_quantity: str = Field(description="Ilosc wydarzen kulturalnych:")
+        Sport_quantity: str = Field(description="Ilosc wydarzen sportowych:")
+        Rozrywka_quantity: str = Field(description="Ilosc wydarzen rozrywkowych:")
+        Inne_quantity: str = Field(description="Ilosc innych wydarzen :")
+    print("Zaczynam generowanie odpowiedzi")
+
+    if client is None:
+        ai_response = f"Jako system Smart City AI (tryb MOCK) odpowiadam: ."
+        return jsonify({"response": ai_response})
+
+    try:
+        #kontekts
+        event_context = load_facebook_events("data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json")
+        prompt = (
+            f"Jestes pomocnikiem przy analizie danych dla klasyfikacji  wydarzeń w gdansku z pliku data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json "
+            f"Na podstawie przesłanych danych przyporządkuj wydarzenie do jednej z czterech kategorii: KULTURA/SPORT/ROZRYWKA/INNE. Policz ile wydarzeń pasuje do kazdej kategorii. Bardzo wazne, odpowiedz samą liczbą pasujących wydarzeń według kolejności w prompcie!"
+            f"{event_context}"
+
+        )
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config={
+                "response_mime_type": "application/json",
+                "response_json_schema": Info.model_json_schema(),
+            },
+
+        )
+
+        ai_response = response.text
+        print(ai_response)
+
+
+        print("Zakonczono operacje AL")
+        with open('data.txt', 'w', encoding='utf-8') as f:
+            print("Tworze plik")
+            f.write(ai_response)
+        # data = json.loads(ai_response)
+        # with open('data.json', 'w', encoding='utf-8') as f:
+        #     json.dumps(data, f, ensure_ascii=False, indent=4)
 
     except Exception as e:
         ai_response = f"Błąd komunikacji z modelem AI: {e}"

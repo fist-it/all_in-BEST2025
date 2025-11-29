@@ -22,7 +22,7 @@ function appendMessage(sender, text) {
     const p = document.createElement('p');
     p.innerHTML = `<strong>${sender}:</strong> ${text}`;
     chatMessages.appendChild(p);
-    chatMessages.scrollTop = chatMessages.scrollHeight; 
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function sendMessage() {
@@ -83,3 +83,25 @@ userInput.addEventListener('keypress', function (e) {
         sendMessage();
     }
 });
+
+function getMessage_admin(){
+    fetch('/api/chat_admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        //ai response
+        appendMessage('AI', data.response);
+    })
+    .catch(error => {
+        appendMessage('AI', 'Przepraszam, wystąpił błąd komunikacji z serwerem.');
+        console.error('Błąd API chatbota:', error);
+    });
+}
+
+function getData(){
+
+}
