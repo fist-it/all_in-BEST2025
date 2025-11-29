@@ -20,6 +20,7 @@ var markersById = {};
 
 var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
     onEachFeature: function(feature, layer) {
+        // Stylizacja
         var l_m = feature.properties.L_MIESZK;
         var color = "#00FF00";
         if (l_m > 20000) color = "#FF0000";
@@ -34,15 +35,35 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
             fillOpacity: 0.3
         });
 
+        // Obsługa kliknięcia (BEZ bindPopup - tylko obliczenia)
         layer.on('click', function(e) {
+            var eventsInDistrict = 0;
+            
+            // Zliczamy eventy w tej konkretnej dzielnicy
+            allEvents.forEach(ev => {
+                if(ev.latitude && ev.longitude) {
+                    if (isMarkerInsidePolygon(ev.latitude, ev.longitude, layer)) {
+                        eventsInDistrict++;
+                    }
+                }
+            });
+
             var popText = (l_m > 0) ? l_m.toString() : "Brak danych";
+            var eventCountColor = eventsInDistrict > 0 ? "red" : "gray";
+            
+            // Zapisujemy HTML do zmiennej globalnej
             clickedDistrictInfo = `
-                <div style="background:#f0f8ff; padding:5px; border-radius:4px; margin-bottom:5px; border:1px solid #ccc;">
-                    <b>Dzielnica: ${feature.properties.DZIELNICY}</b><br>
-                    Mieszkańców: ${popText}
+                <div style="background:#f0f8ff; padding:8px; border-radius:4px; margin-bottom:5px; border:1px solid #ccc; font-family: sans-serif;">
+                    <div style="font-size:14px; font-weight:bold; color:#29526E; margin-bottom:4px;">
+                        ${feature.properties.DZIELNICY}
+                    </div>
+                    <div style="font-size:12px;">
+                        👥 Mieszkańców: <b>${popText}</b><br>
+                        📢 Aktywnych zgłoszeń: <b style="color:${eventCountColor}; font-size:14px;">${eventsInDistrict}</b>
+                    </div>
                 </div>
             `;
-            
+            // Propagacja leci dalej do mapy...
         });
     }
 });
@@ -320,3 +341,29 @@ function resetSearch() {
     updateMap();
 }
 
+function isMarkerInsidePolygon(markerLat, markerLng, poly) {
+    var inside = false;
+    var x = markerLat, y = markerLng;
+    
+    var latlngs = poly.getLatLngs();
+
+    function checkRings(rings) {
+        if (!Array.isArray(rings)) return;
+        
+        if (rings.length > 0 && typeof rings[0].lat === 'number') {
+            for (var i = 0, j = rings.length - 1; i < rings.length; j = i++) {
+                var xi = rings[i].lat, yi = rings[i].lng;
+                var xj = rings[j].lat, yj = rings[j].lng;
+
+                var intersect = ((yi > y) != (yj > y)) &&
+                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+        } else {
+            rings.forEach(child => checkRings(child));
+        }
+    }
+
+    checkRings(latlngs);
+    return inside;
+}
