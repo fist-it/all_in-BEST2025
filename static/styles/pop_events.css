@@ -9,8 +9,8 @@
     padding: 8px 12px;
     margin: 5px 0;
     border: none;
-    background-color: #29525E;
-    color: white;
+    background-color: #D4C787;
+    color: #171F40;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
@@ -19,7 +19,7 @@
 }
 
 .popup-menu button:hover {
-    background-color: #171F40;
+    background-color: #BFA95B;
 }
 
 .popup-menu button.btn-add {
