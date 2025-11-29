@@ -11,7 +11,6 @@
     flex-direction: column;
     transition: height 0.8s ease-in-out;
     border-radius: 10px;
-
 }
 
 .chat-header {
@@ -30,6 +29,8 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1; 
+    transition: opacity 0.5s ease-in-out 0.2s;
+    opacity: 0;
 }
 
 #chaticon{
@@ -42,6 +43,15 @@
 .chat-box.collapsed {
     height: 70px;
     min-height: 70px
+}
+
+.chat-box.collapsed .chat-content {
+    opacity: 0;
+}
+
+.chat-box.expanded .chat-content {
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
 }
 
 #toggle-chat-btn {
@@ -80,7 +90,6 @@
     position: relative;
     padding: 0px 20px;
     color: #212a53;
-
 }
 
 #user-input{

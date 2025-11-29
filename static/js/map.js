@@ -58,8 +58,8 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
                         ${feature.properties.DZIELNICY}
                     </div>
                     <div style="font-size:12px;">
-                        👥 Mieszkańców: <b>${popText}</b><br>
-                        📢 Aktywnych zgłoszeń: <b style="color:${eventCountColor}; font-size:14px;">${eventsInDistrict}</b>
+                    <i class="material-icons">groups</i> Mieszkańców: <b>${popText}</b><br>
+                    <i class="material-icons">campaign</i> Aktywnych zgłoszeń: <b style="color:${eventCountColor}; font-size:14px;">${eventsInDistrict}</b>
                     </div>
                 </div>
             `;
@@ -235,9 +235,22 @@ function createMarker(event) {
   if (event.is_mine) {
     deleteButtonHtml = `
             <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
-                <button onclick="deleteEvent(${event.id})" 
+                <button style="    
+                background-color: #3d6483;
+                transition: background-color 300ms ease;
+                color: #fff;
+                border: none;
+                padding: 10px 10px;
+                cursor: pointer;
+                border-radius: 5px;
+                margin: 20px;
+                width: 250px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;" onclick="deleteEvent(${event.id})" 
                         style="background:none; border:none; color:red; cursor:pointer; font-size:11px; text-decoration:underline;">
-                    🗑️ Usuń moje zgłoszenie
+                    <i class="material-icons">delete</i> Usuń moje zgłoszenie
                 </button>
             </div>
         `;
@@ -252,8 +265,8 @@ function createMarker(event) {
                 Głosów: <b id="vote-count-${event.id}">${event.upvoteCount || 0}</b>
             </div>
             <div>
-                <button onclick="vote(${event.id}, 'up')" style="cursor:pointer; background:#d4edda; border:1px solid #c3e6cb; padding:2px 8px; border-radius:4px;">👍</button>
-                <button onclick="vote(${event.id}, 'down')" style="cursor:pointer; background:#f8d7da; border:1px solid #f5c6cb; padding:2px 8px; border-radius:4px;">👎</button>
+                <button onclick="vote(${event.id}, 'up')" style="cursor:pointer; background:#d4edda; border:1px solid #c3e6cb; width: 250px; padding:2px 8px; border-radius:4px;"><i class="material-icons">thumb_up</i></button>
+                <button onclick="vote(${event.id}, 'down')" style="cursor:pointer; background:#f8d7da; border:1px solid #f5c6cb; width: 250px; padding:2px 8px; border-radius:4px;"><i class="material-icons">thumb_down</i></button>
             </div>
             ${deleteButtonHtml}
         </div>
