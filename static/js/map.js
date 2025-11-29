@@ -365,7 +365,7 @@ var resetButton = L.control({position: 'bottomleft'});
 
 resetButton.onAdd = function(map) {
   var div = L.DomUtil.create('div', 'reset-btn-container');
-  div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
+  div.innerHTML = '<button class="reset-control" onclick="resetSearch()"> <i class="material-icons">close</i></button>';
   return div;
 };
 
