@@ -42,15 +42,25 @@
 
      <!-- CHAT BAR BLOCK -->
     <div class="chat-box">
-        <div style="padding: 10px; background-color: #f0f0f0;"> Smart City Chat</div>
-        <div id="chat-messages">
-            <p><strong>AI:</strong> Cześć, co chciałbyś zrobić w Gdańsku?</p>
+    <div class="chat-header"> <div class="chat-right-header"> 
+            <i class="material-icons" id="chaticon">chat_bubble</i>
+            Chatbot
+    </div>
+        <button id="toggle-chat-btn" onclick="toggleChat()" title="Zwiń/Rozwiń">
+            <i class="material-icons">keyboard_arrow_down</i>
+        </button>
+    </div>
+    
+    <div class="chat-content">
+        <div class="chating" id="chat-messages">
+            <p><strong>AI:</strong> Cześć, na jakie wydarzenie w Gdańsku chciałbyś się wybrać?</p>
         </div>
         <div class="chat-input">
             <input type="text" id="user-input" placeholder="Wpisz pytanie...">
-            <button onclick="sendMessage()">Wyślij</button>
+            <button class="sendbtn" onclick="sendMessage()"><i class="material-icons">send</i></button>
         </div>
     </div>
+</div>
 
     <script src="/static/js/script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

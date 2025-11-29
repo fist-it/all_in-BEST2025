@@ -1,15 +1,101 @@
 .chat-box {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            height: 400px;
-            border: 1px solid #ccc;
-            background: white;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        #chat-messages { flex-grow: 1; padding: 10px; overflow-y: auto; }
-        .chat-input { padding: 10px; border-top: 1px solid #ccc; display: flex; }
-        .chat-input input { flex-grow: 1; padding: 8px; border: 1px solid #eee; margin-right: 5px; }
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    border: 1px solid #90876c;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: height 0.3s ease-in-out;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 15px;
+    padding-right: 30px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #90876c;
+    height: 70px;
+}
+
+.chat-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+}
+
+#chaticon{
+    color: #90876c;
+    position: relative;
+    top: 6px;
+    right: 6px;
+}
+
+.chat-box.collapsed {
+    height: 70px;
+    min-height: 70px
+}
+
+#toggle-chat-btn {
+    background-color: #3d6483;
+    transition: background-color 300ms ease;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    right: -40px;
+}
+
+#toggle-chat-btn:hover {
+    background-color: #212a53;
+}
+
+#toggle-chat-btn i {
+    font-size: 28px;
+    position: relative;
+}
+
+.chat-right-header{
+    color:#494435;
+	font-size: 25px ;  
+	font-weight: 500;
+    transition: color 300ms ease;
+}
+
+.chating {
+    position: relative;
+    padding: 0px 20px;
+    color: #212a53;
+
+}
+
+#user-input{
+    position: relative;
+    border: 1px solid #90876c;
+    left: 20px;
+    height: 50px;
+}
+
+#chat-input{
+    position: relative;
+    left: 20px;
+    height: 50px;
+}
+
+
+.sendbtn{
+    position: relative;
+    left: 190px;
+    top: -70px;
+}
