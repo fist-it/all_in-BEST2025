@@ -85,7 +85,6 @@ html, body {
 
 .log h3 {
     color: #90876c;
-    margin-bottom: 20px;
     font-size: 20px ;
     font-weight: bold;
     transition: color 300ms ease;
@@ -138,7 +137,7 @@ html, body {
 }
 
 form {
-	min-height:345px;
+	min-height:200px;
 	position:relative;
 	perspective:1000px;
 	transform-style:preserve-3d;

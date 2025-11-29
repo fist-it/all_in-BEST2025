@@ -1,4 +1,3 @@
-// Collapsible
 var coll = document.getElementsByClassName("collapsible");
 
 for (let i = 0; i < coll.length; i++) {
@@ -16,90 +15,71 @@ for (let i = 0; i < coll.length; i++) {
     });
 }
 
-function getTime() {
-    let today = new Date();
-    hours = today.getHours();
-    minutes = today.getMinutes();
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
 
-    if (hours < 10) {
-        hours = "0" + hours;
+function appendMessage(sender, text) {
+    const p = document.createElement('p');
+    p.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatMessages.appendChild(p);
+    chatMessages.scrollTop = chatMessages.scrollHeight; 
+}
+
+function sendMessage() {
+    const message = userInput.value.trim();
+    if (message === '') return;
+
+    //wiadomosc usera
+    appendMessage('Ty', message);
+    userInput.value = ''; //clean
+
+    //api flask
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        //ai response
+        appendMessage('AI', data.response);
+    })
+    .catch(error => {
+        appendMessage('AI', 'Przepraszam, wystąpił błąd komunikacji z serwerem.');
+        console.error('Błąd API chatbota:', error);
+    });
+}
+
+function toggleChat() {
+        const chatBox = document.querySelector('.chat-box');
+        const chatContent = document.querySelector('.chat-content');
+        const toggleButtonIcon = document.querySelector('#toggle-chat-btn i');
+        const isCollapsed = chatBox.classList.contains('collapsed');
+
+        if (isCollapsed) {
+            // ROZWIJANIE
+            chatBox.classList.remove('collapsed');
+            chatContent.style.display = 'flex';
+            toggleButtonIcon.textContent = 'keyboard_arrow_down';
+            chatBox.style.height = '400px';
+        } else {
+            // ZWIJANIE
+            chatBox.classList.add('collapsed');
+            chatContent.style.display = 'none';
+            toggleButtonIcon.textContent = 'keyboard_arrow_up';
+            chatBox.style.height = '70px';
+        }
     }
 
-    if (minutes < 10) {
-        minutes = "0" + minutes;
-    }
+    // wartosc zero
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.chat-box').style.height = '400px';
+    });
 
-    let time = hours + ":" + minutes;
-    return time;
-}
-
-// Gets the first message
-function firstBotMessage() {
-    let firstMessage = "How's it going?"
-    document.getElementById("botStarterMessage").innerHTML = '<p class="botText"><span>' + firstMessage + '</span></p>';
-
-    let time = getTime();
-
-    $("#chat-timestamp").append(time);
-    document.getElementById("userInput").scrollIntoView(false);
-}
-
-firstBotMessage();
-
-// Retrieves the response
-function getHardResponse(userText) {
-    let botResponse = getBotResponse(userText);
-    let botHtml = '<p class="botText"><span>' + botResponse + '</span></p>';
-    $("#chatbox").append(botHtml);
-
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
-}
-
-//Gets the text text from the input box and processes it
-function getResponse() {
-    let userText = $("#textInput").val();
-
-    if (userText == "") {
-        userText = "I love Code Palace!";
-    }
-
-    let userHtml = '<p class="userText"><span>' + userText + '</span></p>';
-
-    $("#textInput").val("");
-    $("#chatbox").append(userHtml);
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
-
-    setTimeout(() => {
-        getHardResponse(userText);
-    }, 1000)
-
-}
-
-// Handles sending text via button clicks
-function buttonSendText(sampleText) {
-    let userHtml = '<p class="userText"><span>' + sampleText + '</span></p>';
-
-    $("#textInput").val("");
-    $("#chatbox").append(userHtml);
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
-
-    //Uncomment this if you want the bot to respond to this buttonSendText event
-    // setTimeout(() => {
-    //     getHardResponse(sampleText);
-    // }, 1000)
-}
-
-function sendButton() {
-    getResponse();
-}
-
-function heartButton() {
-    buttonSendText("Heart clicked!")
-}
-
-// Press enter to send a message
-$("#textInput").keypress(function (e) {
-    if (e.which == 13) {
-        getResponse();
+userInput.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        sendMessage();
     }
 });

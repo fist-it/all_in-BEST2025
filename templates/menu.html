@@ -8,7 +8,7 @@
         <ul>
             <div class="MenuHead">
                 <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
-                <li><h2>Cześć,      , to jest twój panel użytkownika!</h2></li>
+                <li><h2>Cześć {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
             </div>
             
             <h1>Checkboxes</h1>
@@ -41,56 +41,33 @@
     </div>
 
      <!-- CHAT BAR BLOCK -->
-    <div class="chat-bar-collapsible">
-        <button id="chat-button" type="button" class="collapsible">Twój asystent AI!
-            <i id="chat-icon" style="color: #fff;" class="fa fa-fw fa-comments-o"></i>
-        </button>
-
-        <div class="content">
-            <div class="full-chat-block">
-                <!-- Message Container -->
-                <div class="outer-container">
-                    <div class="chat-container">
-                        <!-- Messages -->
-                        <div id="chatbox">
-                            <h5 id="chat-timestamp"></h5>
-                            <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
-                        </div>
-
-                        <!-- User input box -->
-                        <div class="chat-bar-input-block">
-                            <div id="userInput">
-                                <input id="textInput" class="input-box" type="text" name="msg"
-                                    placeholder="Tap 'Enter' to send a message">
-                                <p></p>
-                            </div>
-
-                            <div class="chat-bar-icons">
-                                <i id="chat-icon" style="color: crimson;" class="fa fa-fw fa-heart"
-                                    onclick="heartButton()"></i>
-                                <i id="chat-icon" style="color: #333;" class="fa fa-fw fa-send"
-                                    onclick="sendButton()"></i>
-                            </div>
-                        </div>
-
-                        <div id="chat-bar-bottom">
-                            <p></p>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
+    <div class="chat-box">
+    <div class="chat-header"> <div class="chat-right-header"> 
+            <i class="material-icons" id="chaticon">chat_bubble</i>
+            Chatbot
     </div>
+        <button id="toggle-chat-btn" onclick="toggleChat()" title="Zwiń/Rozwiń">
+            <i class="material-icons">keyboard_arrow_down</i>
+        </button>
+    </div>
+    
+    <div class="chat-content">
+        <div class="chating" id="chat-messages">
+            <p><strong>AI:</strong> Cześć, na jakie wydarzenie w Gdańsku chciałbyś się wybrać?</p>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Wpisz pytanie...">
+            <button class="sendbtn" onclick="sendMessage()"><i class="material-icons">send</i></button>
+        </div>
+    </div>
+</div>
 
     <script src="/static/js/script.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/static/js/responses.js"></script>
     <script src="/static/js/chat.js"></script>
-    <script>
-    $('.sidePanel').sliiide({place: 'left', toggle: '#close-btn'});
-    </script>
+    <!-- <script> -->
+    <!-- $('.sidePanel').sliiide({place: 'left', toggle: '#close-btn'}); -->
+    <!-- </script> -->
 </body>
 </html>
