@@ -78,6 +78,13 @@ function toggleDzielnice() {
 
 var eventsList = [];
 
+var customMarker = L.icon({
+    iconUrl: "../static/images/custom.png",
+    iconSize: [20, 20],
+
+
+});
+
 events.then(data => {
   data = data.entries();
   events_grouped = [];
@@ -89,7 +96,7 @@ events.then(data => {
       <br>Uczestnicy: ${event.usersGoing}<br>
       <a href="${event.url}" target="_blank">Link do wydarzenia</a>
       </div>`;
-    marker = L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+    marker = L.marker([event.latitude, event.longitude],{icon: customMarker}).addTo(map).bindPopup(popupContent);
     eventsList.push(marker);
   })
 });
