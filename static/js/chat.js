@@ -52,6 +52,32 @@ function sendMessage() {
     });
 }
 
+function toggleChat() {
+        const chatBox = document.querySelector('.chat-box');
+        const chatContent = document.querySelector('.chat-content');
+        const toggleButtonIcon = document.querySelector('#toggle-chat-btn i');
+        const isCollapsed = chatBox.classList.contains('collapsed');
+
+        if (isCollapsed) {
+            // ROZWIJANIE
+            chatBox.classList.remove('collapsed');
+            chatContent.style.display = 'flex';
+            toggleButtonIcon.textContent = 'keyboard_arrow_down';
+            chatBox.style.height = '400px';
+        } else {
+            // ZWIJANIE
+            chatBox.classList.add('collapsed');
+            chatContent.style.display = 'none';
+            toggleButtonIcon.textContent = 'keyboard_arrow_up';
+            chatBox.style.height = '70px';
+        }
+    }
+
+    // wartosc zero
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.chat-box').style.height = '400px';
+    });
+
 userInput.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         sendMessage();

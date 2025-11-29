@@ -14,3 +14,15 @@ openPanelButton.addEventListener('click', () => {
 closePanelButton.addEventListener('click', () => {
     sidePanel.classList.remove('open');
 });
+
+function toggleNav() {
+    var sidePanel = document.getElementById("sidePanel");
+    
+    if (sidePanel.style.width === "250px") {
+        sidePanel.style.width = "0px";
+        sidePanel.style.left = "-200px"; 
+    } else {
+        sidePanel.style.width = "250px";
+        sidePanel.style.left = "16px";
+    }
+}
