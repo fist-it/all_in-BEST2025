@@ -1,33 +1,29 @@
 .popup-menu {
-    text-align: center;
-    min-width: 150px;
+  text-align: center;
+  min-width: 150px;
 }
 
 .popup-menu button {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    margin: 5px 0;
-    border: none;
-    background-color: #29525E;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    text-align: left;
-    transition: background 0.2s;
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border: none;
+  background-color: #29525E;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.2s;
 }
 
 .popup-menu button:hover {
-    background-color: #171F40;
+  background-color: #171F40;
 }
 
 .popup-menu button.btn-add {
-    font-weight: bold;
-}
-
-.popup-menu button.btn-search {
-    
+  font-weight: bold;
 }
 
 .pulsating-circle {
