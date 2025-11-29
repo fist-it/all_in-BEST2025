@@ -151,6 +151,8 @@ z-index: 1000;
     background-color: #f4f4f4;
     padding: 5px;
     z-index: 1001;
+    justify-content: center;
+    text-align: center;
 }
 /* #popup { */
 /*     position: inherit; */
@@ -249,3 +251,4 @@ z-index: 1000;
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+
