@@ -77,6 +77,7 @@ function toggleDzielnice() {
 }
 
 var eventsList = [];
+
 events.then(data => {
   data = data.entries();
   events_grouped = [];
@@ -136,9 +137,9 @@ map.on('click', function(e) {
     content += `<div style="font-size:10px; color:#888; margin:5px 0;">${lat}, ${lng}</div>`;
 
     content += `
-        <button class="btn-add" onclick="openAddEventModal()">➕ Dodaj zdarzenie</button>
-        <button class="btn-search" onclick="searchNearby()">🔍 Szukaj w promieniu 1km</button>
-        <button onclick="copyCoords()">📋 Kopiuj współrzędne</button>
+        <button class="btn-add" onclick="openAddEventModal()"><i class="material-icons">add</i> Dodaj zdarzenie</button>
+        <button class="btn-search" onclick="searchNearby()"><i class="material-icons">search</i> Szukaj w promieniu 1km</button>
+        <button onclick="copyCoords()"><i class="material-icons">content_copy</i> Kopiuj współrzędne</button>
     </div>`;
 
   if (is_popup_open) {
@@ -197,7 +198,6 @@ document.getElementById('addEventForm').addEventListener('submit', function(e) {
     });
 });
 
-var userEventsList = [];
 function createMarker(event) {
   if (!event.latitude || !event.longitude) return;
 
@@ -212,7 +212,6 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
-    userEventsList.push(marker);
   } else {
     var customIcon = L.divIcon({
       className: 'custom-icon-container',
@@ -221,7 +220,6 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
-    userEventsList.push(marker);
   }
 
   var deleteButtonHtml = '';
@@ -302,6 +300,7 @@ function copyCoords() {
   });
 }
 
+var userEventsList = [];
 
 function updateMap() {
   fetch('/api/events/user')
@@ -366,7 +365,7 @@ var resetButton = L.control({position: 'bottomleft'});
 
 resetButton.onAdd = function(map) {
   var div = L.DomUtil.create('div', 'reset-btn-container');
-  div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
+  div.innerHTML = '<button class="reset-control" onclick="resetSearch()"> <i class="material-icons">close</i></button>';
   return div;
 };
 
