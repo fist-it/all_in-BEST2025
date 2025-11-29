@@ -7,10 +7,34 @@ from werkzeug.security import generate_password_hash, check_password_hash # hash
 from google import genai
 from models import db, User, Event, Vote, get_user_by_username
 from geopy.geocoders import Nominatim
+import datetime
+
+try:
+    if os.getenv("GEMINI_API_KEY") is None:
+        print("brak GEMINI_API_KEY w zmiennych srodowiskowych")
+        client = None 
+    else:
+        client = genai.Client()
+        print("chatbot aktywny")
+except Exception as e:
+    print(f"Błąd inicjalizacji klienta AI: {e}")
+    client = None
 
 def main():
     #w trybie developerskim
     app.run(debug=True)
+
+def load_facebook_events(nazwa_pliku="dane.json"):
+    if not os.path.exists(nazwa_pliku):
+        return None
+    try:
+        with open(nazwa_pliku, 'r', encoding='utf-8') as plik:
+            dane_json = json.load(plik)
+            string_json = json.dumps(dane_json, indent=4, ensure_ascii=False)
+            return string_json        
+    except Exception:
+        return None
+
 
 
 #flask, login, db
@@ -98,10 +122,6 @@ def logout():
 def index():
     return render_template('index.html')
 
-#==
-#API: Facebook Events
-#==
-
 @app.route('/api/events/fb')
 # @login_required # - Disabled for API development
 def api_events_fb():
@@ -139,6 +159,7 @@ def api_events_user():
                 "location.city": "Gdańsk", 
                 "location.countryCode": "PL", 
                 "utcStartDate": event.date, 
+                "utcEndDate": event.end_date, 
                 "latitude": event.latitude,
                 "longitude": event.longitude,
                 "source": "User",
@@ -169,21 +190,21 @@ def api_events_user():
 # jeżeli category=static to danie downvote po prostu jakoś się odznacza
 # jeżeli cateogory=live to danie downvote oznacza wydarzenie na mapie jako zakończone 
 @app.route('/api/add_event', methods=['POST'])
+# @login_required # - Disabled for API development
 def add_event():
+    if not current_user.is_authenticated:
+        return jsonify({"error": "Musisz być zalogowany, aby dodać zdarzenie!"}), 401
+
     if request.method == 'POST':
         title = request.form.get('title')
         user_event_type = request.form.get('type')
-        
         raw_lat = request.form.get('latitude')
         raw_lng = request.form.get('longitude')
-        
-        # Opcjonalna nazwa własna (np. "nig z Papieżem")
         location_input = request.form.get('location_name') 
 
         lat, lng = None, None
         final_location_name = location_input
 
-        # walidacja i reverse Geocoding
         if raw_lat and raw_lng:
             try:
                 lat = float(raw_lat)
@@ -192,17 +213,13 @@ def add_event():
                 if not final_location_name:
                     try:
                         location_data = geolocator.reverse(f"{lat}, {lng}", timeout=5)
-                        if location_data:
-                            final_location_name = location_data.address
-                        else:
-                            final_location_name = f"Lokalizacja: {lat:.3f}, {lng:.3f}"
+                        final_location_name = location_data.address if location_data else f"{lat:.3f}, {lng:.3f}"
                     except:
                         final_location_name = "Nieznany adres"
-                        print("Błąd reverse geocoding")
             except ValueError:
-                return jsonify({"error": "Nieprawidłowy format współrzędnych"}), 400
+                return jsonify({"error": "Błąd danych współrzędnych"}), 400
         else:
-            return jsonify({"error": "Musisz zaznaczyć miejsce na mapie!"}), 400
+            return jsonify({"error": "Brak współrzędnych!"}), 400
 
         if not final_location_name:
             final_location_name = "Zaznaczone miejsce"
@@ -211,29 +228,36 @@ def add_event():
         now = datetime.now(timezone.utc)
         default_end = now + timedelta(hours=1)
 
-        if current_user.is_authenticated:
-            event_author = current_user
-        else:
-            return jsonify({"error": "Musisz być zalogowany"}), 401
-
         new_event = Event(
             title=title,
             date=now,
             end_date=default_end,
             event_type=user_event_type or 'live',
-            location_name=final_location_name, # Tu wpadnie adres wyliczony przez geopy lub wpisany przez usera
+            location_name=final_location_name,
             latitude=lat,
             longitude=lng,
-            author=event_author
+            author=current_user
         )
 
-        db.session.add(new_event)
-        db.session.commit()
-        
-        # Przekierowanie na stronę główną
-        return redirect(url_for('index'))
+        try:
+            db.session.add(new_event)
+            db.session.commit()
+            
+            return jsonify({
+                "message": "Dodano pomyślnie!",
+                "event": {
+                    "id": new_event.id,
+                    "title": new_event.title,
+                    "lat": new_event.latitude,
+                    "lng": new_event.longitude
+                }
+            }), 201
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
 
-    return redirect(url_for('index'))
+    return jsonify({"error": "Method not allowed"}), 405
 
 @app.route('/api/delete_event/<int:event_id>', methods=['DELETE'])
 @login_required
@@ -261,65 +285,70 @@ def delete_event(event_id):
         return jsonify({'error': 'Unauthorized'}), 403
 
 @app.route('/api/vote', methods=['POST'])
+# @login_required # - Disabled for API development
 def vote_event():
     if not current_user.is_authenticated:
-        return jsonify({'error': 'Musisz być zalogowany, aby głosować'}), 401
+        return jsonify({'error': 'Musisz być zalogowany!'}), 401
 
     data = request.json
     event_id = data.get('event_id')
-    vote_type = data.get('vote')
+    vote_type = data.get('vote') # 'up' lub 'down'
     
     event = db.session.get(Event, event_id)
     if not event:
-        return jsonify({'error': 'Event not found'}), 404
+        return jsonify({'error': 'Event nie istnieje'}), 404
 
     existing_vote = Vote.query.filter_by(user_id=current_user.id, event_id=event_id).first()
-
     if existing_vote:
-        return jsonify({'error': 'Już oddałeś głos na to wydarzenie!'}), 400
-        
-    new_vote = Vote(user_id=current_user.id, event_id=event.id, vote_type=vote_type)
+        return jsonify({'error': 'Już oddałeś głos na to zgłoszenie!'}), 400
+
+    new_vote = Vote(user_id=current_user.id, event_id=event_id, vote_type=vote_type)
     db.session.add(new_vote)
 
-    if event.event_type == 'live':        
-        now = datetime.now(UTC) # timezone aware
-        hard_cap = now + MAX_FUTURE_VISIBILITY
+    if event.event_type == 'live':
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        
+        # Obliczamy Hard Cap (np. max 3h od teraz)
+        hard_cap = now + MAX_FUTURE_VISIBILITY 
+
+        if event.end_date.tzinfo is None:
+            event.end_date = event.end_date.replace(tzinfo=timezone.utc)
 
         if vote_type == 'up':
             event.upvote_count += 1
-            if event.end_date.replace(tzinfo=UTC) < now: # strefy czasowe fix
+            
+            # Jeśli wygasło -> Ożywiamy
+            if event.end_date < now:
                 event.end_date = now + TIME_EXTENSION
             else:
-                proposed_end_date = event.end_date.replace(tzinfo=UTC) + TIME_EXTENSION
-                if proposed_end_date > hard_cap:
-                    event.end_date = hard_cap
-                else:
-                    event.end_date = proposed_end_date
+                proposed_end = event.end_date + TIME_EXTENSION
+                event.end_date = min(proposed_end, hard_cap)
 
         elif vote_type == 'down':
             event.upvote_count -= 1
-            event.end_date = event.end_date.replace(tzinfo=UTC) - TIME_EXTENSION
-        
-            if event.upvote_count < -5:
+            event.end_date -= TIME_EXTENSION
+            
+            if event.upvote_count <= -1:
                 event.end_date = now
 
-    else: # STATIC
+    else:
         if vote_type == 'up':
             event.upvote_count += 1
         elif vote_type == 'down':
             event.upvote_count -= 1
+            if event.upvote_count <= -10:
+                db.session.delete(event)
 
     try:
         db.session.commit()
+        return jsonify({
+            'new_score': event.upvote_count,
+            'message': 'Głos zapisany'
+        }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Błąd zapisu głosu'}), 500
-    
-    return jsonify({
-        'new_score': event.upvote_count, 
-        'new_end_date': event.end_date.isoformat(),
-        'message': 'Głos zapisany'
-    })
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/events', methods=['GET'])
 # @login_required # - Disabled for API development
@@ -337,7 +366,7 @@ def api_events():
                 "name": event.title,
                 "location.name": event.location_name,
                 "location.city": "Gdańsk",
-                "location.countryCode": "PL", 
+                "location.countryCode": "PL",
                 "utcStartDate": event.date,
                 "latitude": event.latitude,
                 "longitude": event.longitude,
@@ -346,6 +375,62 @@ def api_events():
             })
 
     return jsonify(all_events)
+
+@app.route('/api/delete_event/<int:event_id>', methods=['DELETE'])
+# @login_required # - Disabled for API development
+def delete_event_api(event_id):
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Musisz być zalogowany'}), 401
+
+    event = db.session.get(Event, event_id)
+    
+    if not event:
+        return jsonify({'error': 'Wydarzenie nie istnieje'}), 404
+
+    if event.user_id != current_user.id:
+        return jsonify({'error': 'Nie masz uprawnień do usunięcia tego zgłoszenia'}), 403
+
+    try:
+        Vote.query.filter_by(event_id=event.id).delete() 
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({'message': 'Usunięto pomyślnie'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 50
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def handle_chat():
+    user_message = request.json.get('message')
+    czas = datetime.datetime.now()
+
+    if client is None:
+        ai_response = f"Jako system Smart City AI (tryb MOCK) odpowiadam: {user_message.upper()}."
+        return jsonify({"response": ai_response})
+
+    try:
+        #kontekts
+        event_context = load_facebook_events("data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json")
+        prompt = (
+            f"Jestes doradca do wyboru wydarzenia w gdansku z pliku data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json "
+            f"Uzytkownik mówi ci na co ma ochotę, ty musisz mu dobrać do tego wydarzenie, które jeszcze nie mineło. Jak poprosi o konkretny dzień, ma ono być w ten dzień."
+            f"Twoja odpowiedź ma być krótka, tylko proponowane wydarzenie i dlaczego (max 1,2 zdania). Oto wiadomość (jeżeli jest nie na temat, odpisz: Wiadomość nie na temat): {user_message}"
+            f"{event_context}"
+            f"{czas}"
+        )
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+
+        ai_response = response.text
+
+    except Exception as e:
+        ai_response = f"Błąd komunikacji z modelem AI: {e}"
+
+    return jsonify({"response": ai_response})
 
 if __name__ == '__main__':
     main()
