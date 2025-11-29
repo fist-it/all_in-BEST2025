@@ -8,56 +8,48 @@
         <ul>
             <div class="MenuHead">
                 <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
-
-      <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
+                <li><h2>Cześć {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
             </div>
-        <p>Tu możesz umieścić dowolną treść: tekst, obrazki, formularze...</p>
+            
+            <h1>Checkboxes</h1>
+            <label class="container">One
+                <input type="checkbox" checked="checked" onclick="fuction1()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Two
+                <input type="checkbox" checked="checked" onclick="fuction2()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Three
+                <input type="checkbox" checked="checked" onclick="fuction3()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Four
+                <input type="checkbox" checked="checked" onclick="fuction4()">
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Five
+                <input type="checkbox" checked="checked" onclick="fuction5()">
+            <span class="checkmark"></span>
+            </label>
+
       </ul>
     </div>
 
      <!-- CHAT BAR BLOCK -->
-    <div class="chat-bar-collapsible">
-        <button id="chat-button" type="button" class="collapsible">Twój asystent AI!
-            <i id="chat-icon" style="color: #fff;" class="fa fa-fw fa-comments-o"></i>
-        </button>
-
-        <div class="content">
-            <div class="full-chat-block">
-                <!-- Message Container -->
-                <div class="outer-container">
-                    <div class="chat-container">
-                        <!-- Messages -->
-                        <div id="chatbox">
-                            <h5 id="chat-timestamp"></h5>
-                            <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
-                        </div>
-
-                        <!-- User input box -->
-                        <div class="chat-bar-input-block">
-                            <div id="userInput">
-                                <input id="textInput" class="input-box" type="text" name="msg"
-                                    placeholder="Tap 'Enter' to send a message">
-                                <p></p>
-                            </div>
-
-                            <div class="chat-bar-icons">
-                                <i id="chat-icon" style="color: crimson;" class="fa fa-fw fa-heart"
-                                    onclick="heartButton()"></i>
-                                <i id="chat-icon" style="color: #333;" class="fa fa-fw fa-send"
-                                    onclick="sendButton()"></i>
-                            </div>
-                        </div>
-
-                        <div id="chat-bar-bottom">
-                            <p></p>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
+    <div class="chat-box">
+        <div style="padding: 10px; background-color: #f0f0f0;"> Smart City Chat</div>
+        <div id="chat-messages">
+            <p><strong>AI:</strong> Cześć, co chciałbyś zrobić w Gdańsku?</p>
         </div>
-
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Wpisz pytanie...">
+            <button onclick="sendMessage()">Wyślij</button>
+        </div>
     </div>
 
     <script src="/static/js/script.js"></script>

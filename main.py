@@ -7,10 +7,34 @@ from werkzeug.security import generate_password_hash, check_password_hash # hash
 from google import genai
 from models import db, User, Event, Vote, get_user_by_username
 from geopy.geocoders import Nominatim
+import datetime
+
+try:
+    if os.getenv("GEMINI_API_KEY") is None:
+        print("brak GEMINI_API_KEY w zmiennych srodowiskowych")
+        client = None 
+    else:
+        client = genai.Client()
+        print("chatbot aktywny")
+except Exception as e:
+    print(f"Błąd inicjalizacji klienta AI: {e}")
+    client = None
 
 def main():
     #w trybie developerskim
     app.run(debug=True)
+
+def load_facebook_events(nazwa_pliku="dane.json"):
+    if not os.path.exists(nazwa_pliku):
+        return None
+    try:
+        with open(nazwa_pliku, 'r', encoding='utf-8') as plik:
+            dane_json = json.load(plik)
+            string_json = json.dumps(dane_json, indent=4, ensure_ascii=False)
+            return string_json        
+    except Exception:
+        return None
+
 
 
 #flask, login, db
@@ -97,10 +121,6 @@ def logout():
 @login_required
 def index():
     return render_template('index.html')
-
-#==
-#API: Facebook Events
-#==
 
 @app.route('/api/events/fb')
 # @login_required # - Disabled for API development
@@ -377,7 +397,40 @@ def delete_event_api(event_id):
         return jsonify({'message': 'Usunięto pomyślnie'}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 50
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def handle_chat():
+    user_message = request.json.get('message')
+    czas = datetime.datetime.now()
+
+    if client is None:
+        ai_response = f"Jako system Smart City AI (tryb MOCK) odpowiadam: {user_message.upper()}."
+        return jsonify({"response": ai_response})
+
+    try:
+        #kontekts
+        event_context = load_facebook_events("data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json")
+        prompt = (
+            f"Jestes doradca do wyboru wydarzenia w gdansku z pliku data/dataset_facebook-events-scraper_2025-11-28_10-21-23-668-formatted.json "
+            f"Uzytkownik mówi ci na co ma ochotę, ty musisz mu dobrać do tego wydarzenie, które jeszcze nie mineło. Jak poprosi o konkretny dzień, ma ono być w ten dzień."
+            f"Twoja odpowiedź ma być krótka, tylko proponowane wydarzenie i dlaczego (max 1,2 zdania). Oto wiadomość (jeżeli jest nie na temat, odpisz: Wiadomość nie na temat): {user_message}"
+            f"{event_context}"
+            f"{czas}"
+        )
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+
+        ai_response = response.text
+
+    except Exception as e:
+        ai_response = f"Błąd komunikacji z modelem AI: {e}"
+
+    return jsonify({"response": ai_response})
 
 if __name__ == '__main__':
     main()
