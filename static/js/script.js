@@ -26,3 +26,15 @@ function toggleNav() {
         sidePanel.style.left = "16px";
     }
 }
+
+function toggleNavAdmin() {
+    var sidePanel = document.getElementById("sidePanel2");
+    
+    if (sidePanel.style.width === "450px") {
+        sidePanel.style.width = "0px";
+        sidePanel.style.left = "-400px"; 
+    } else {
+        sidePanel.style.width = "450px";
+        sidePanel.style.left = "16px";
+    }
+}

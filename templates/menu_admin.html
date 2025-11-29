@@ -1,15 +1,13 @@
 
 <body>
     <!-- Przycisk do otwierania okienka -->
-    <button id="openPanel"><i class="material-icons">home</i></button>
-
+    <button id="openPanel2" onclick="toggleNavAdmin()"><i class="material-icons">settings</i></button>
     <!-- Wysuwane okienko -->
-    <div id="sidePanel" class="panel">
+    <div id="sidePanel2" class="panel">
         <ul>
             <div class="MenuHead">
-                <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
 
-      <li><h2>Cześć,  {{ current_user.username }}, to jest twój panel ADMINISTRATORA!</h2></li>
+      <li><h2>To jest twój panel ADMINISTRATORA!</h2></li>
             </div>
 
             <button id="raport" onclick="getMessage_admin()">Wygeneruj raport!</button>
@@ -50,6 +48,7 @@ new Chart(ctx, {
       </ul>
     </div>
 
+    
 
 
 
