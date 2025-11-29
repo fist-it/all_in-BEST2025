@@ -14,27 +14,21 @@ async function fetchEvents() {
 
 var events = fetchEvents();
 
-var layers = [];
 
 var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
   onEachFeature: function(feature, layer) {
-    var holder = [];
-    // for (var key in feature.properties) {
-    //   holder.push(key + ": " + feature.properties[key] + "<br>");
-    //   popupContent = holder.join("");
-    //   layer.bindPopup(popupContent); // DO KLIKNIECIA
-    // };
+
     liczba_mieszkancow = feature.properties.L_MIESZK;
     if (liczba_mieszkancow > 20000) {
-      layer.setStyle({fillColor: "#FF0000"});
+      layer.setStyle({ fillColor: "#FF0000" });
     } else if (liczba_mieszkancow > 15000) {
-      layer.setStyle({fillColor: "#FF7F00"});
+      layer.setStyle({ fillColor: "#FF7F00" });
     } else if (liczba_mieszkancow > 10000) {
-      layer.setStyle({fillColor: "#FFFF00"});
+      layer.setStyle({ fillColor: "#FFFF00" });
     } else if (liczba_mieszkancow > 5000) {
-      layer.setStyle({fillColor: "#7FFF00"});
+      layer.setStyle({ fillColor: "#7FFF00" });
     } else {
-      layer.setStyle({fillColor: "#00FF00"});
+      layer.setStyle({ fillColor: "#00FF00" });
     }
     liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: " + liczba_mieszkancow.toString() + "<br>";
     if (liczba_mieszkancow == null) {
@@ -43,12 +37,10 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
     if (liczba_mieszkancow == 0) {
       liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: Brak danych<br>";
     }
-      
+
     popupContent = "<div id='popup'><b>Dzielnica:</b> " + feature.properties.DZIELNICY + liczba_mieszkancow_text + "</div>";
 
     layer.bindPopup(popupContent); // DO KLIKNIECIA
-    layers.push(layer);
-    // console.log("adding to map")
   },
   style: function(feature) {
     return {
@@ -67,6 +59,8 @@ function toggleDzielnice() {
   }
 }
 
+var eventsList = [];
+
 events.then(data => {
   data = data.entries();
   events_grouped = [];
@@ -78,9 +72,30 @@ events.then(data => {
       <br>Uczestnicy: ${event.usersGoing}<br>
       <a href="${event.url}" target="_blank">Link do wydarzenia</a>
       </div>`;
-    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+    marker = L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+    eventsList.push(marker);
   })
 });
+
+function toggleEvents() {
+  eventsList.forEach(marker => {
+    if (map.hasLayer(marker)) {
+      map.removeLayer(marker);
+    } else {
+      map.addLayer(marker);
+    }
+  })
+};
+
+function toggleUserEvents() {
+  userEventsList.forEach(marker => {
+    if (map.hasLayer(marker)) {
+      map.removeLayer(marker);
+    } else {
+      map.addLayer(marker);
+    }
+  })
+};
 
 map.removeControl(map.zoomControl);
 
@@ -92,13 +107,13 @@ var existingMarkers = {};
 
 // OBSŁUGA KLIKNIĘCIA NA MAPIE
 map.on('click', function(e) {
-    selectedCoords = e.latlng; // Zapisujemy kliknięte współrzędne
-    
-    var lat = selectedCoords.lat.toFixed(5);
-    var lng = selectedCoords.lng.toFixed(5);
+  selectedCoords = e.latlng; // Zapisujemy kliknięte współrzędne
 
-    // Tworzymy HTML dla menu w dymku
-    var popupContent = `
+  var lat = selectedCoords.lat.toFixed(5);
+  var lng = selectedCoords.lng.toFixed(5);
+
+  // Tworzymy HTML dla menu w dymku
+  var popupContent = `
         <div class="popup-menu">
             <div style="font-size:11px; color:#888; margin-bottom:5px;">
                 ${lat}, ${lng}
@@ -118,90 +133,90 @@ map.on('click', function(e) {
         </div>
     `;
 
-    if (is_popup_open) {
-        map.closePopup();
-        is_popup_open = false;
-        return;
-    }
-    is_popup_open = true;
-    L.popup()
-        .setLatLng(e.latlng)
-        .setContent(popupContent)
-        .openOn(map);
+  if (is_popup_open) {
+    map.closePopup();
+    is_popup_open = false;
+    return;
+  }
+  is_popup_open = true;
+  L.popup()
+    .setLatLng(e.latlng)
+    .setContent(popupContent)
+    .openOn(map);
 });
 
 function openAddEventModal() {
-    if (!selectedCoords) return;
-    map.closePopup();
-    
-    document.getElementById('input-lat').value = selectedCoords.lat;
-    document.getElementById('input-lng').value = selectedCoords.lng;
-    document.getElementById('display-coords').innerText = 
-        selectedCoords.lat.toFixed(5) + ", " + selectedCoords.lng.toFixed(5);
-    
-    document.getElementById('eventModal').style.display = 'block';
+  if (!selectedCoords) return;
+  map.closePopup();
+
+  document.getElementById('input-lat').value = selectedCoords.lat;
+  document.getElementById('input-lng').value = selectedCoords.lng;
+  document.getElementById('display-coords').innerText =
+    selectedCoords.lat.toFixed(5) + ", " + selectedCoords.lng.toFixed(5);
+
+  document.getElementById('eventModal').style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('eventModal').style.display = 'none';
-    document.getElementById('addEventForm').reset();
+  document.getElementById('eventModal').style.display = 'none';
+  document.getElementById('addEventForm').reset();
 }
 
 document.getElementById('addEventForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    var formData = new FormData(this);
+  var formData = new FormData(this);
 
-    fetch('/api/add_event', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json().then(data => ({status: response.status, body: data})))
+  fetch('/api/add_event', {
+    method: 'POST',
+    body: formData
+  })
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
     .then(result => {
-        if (result.status === 201) {
-            closeModal();
-            updateMap();
-        } else {
-            alert("Błąd: " + (result.body.error || "Coś poszło nie tak"));
-            if (result.status === 401) {
-                window.location.href = "/login";
-            }
+      if (result.status === 201) {
+        closeModal();
+        updateMap();
+      } else {
+        alert("Błąd: " + (result.body.error || "Coś poszło nie tak"));
+        if (result.status === 401) {
+          window.location.href = "/login";
         }
+      }
     })
     .catch(err => {
-        console.error("Error:", err);
-        alert("Błąd połączenia z serwerem.");
+      console.error("Error:", err);
+      alert("Błąd połączenia z serwerem.");
     });
 });
 
 function createMarker(event) {
-    if (!event.latitude || !event.longitude) return;
+  if (!event.latitude || !event.longitude) return;
 
-    var marker;
+  var marker;
 
-    var type = event.event_type || 'static'; 
+  var type = event.event_type || 'static';
 
-    if (type === 'live') {
-        var customIcon = L.divIcon({
-            className: 'pulsating-circle',
-            html: `<div></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]  
-        });
-        marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-    } else {
-        var customIcon = L.divIcon({
-            className: 'custom-icon-container',
-            html: `<div class="static-marker"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
-        marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-    }
-        
-    var deleteButtonHtml = '';
-    if (event.is_mine) {
-        deleteButtonHtml = `
+  if (type === 'live') {
+    var customIcon = L.divIcon({
+      className: 'pulsating-circle',
+      html: `<div></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+  } else {
+    var customIcon = L.divIcon({
+      className: 'custom-icon-container',
+      html: `<div class="static-marker"></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+  }
+
+  var deleteButtonHtml = '';
+  if (event.is_mine) {
+    deleteButtonHtml = `
             <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
                 <button onclick="deleteEvent(${event.id})" 
                         style="background:none; border:none; color:red; cursor:pointer; font-size:11px; text-decoration:underline;">
@@ -209,9 +224,9 @@ function createMarker(event) {
                 </button>
             </div>
         `;
-    }
+  }
 
-    var popupContent = `
+  var popupContent = `
         <div style="text-align:center; min-width:160px;">
             <strong style="font-size:14px;">${event.name}</strong><br>
             <span style="color:gray; font-size:11px;">${event['location.name']}</span>
@@ -230,109 +245,111 @@ function createMarker(event) {
         </div>
     `;
 
-    marker.bindPopup(popupContent);
-    
-    markersLayer.addLayer(marker);
+  marker.bindPopup(popupContent);
+  userEventsList.push(marker);
+  markersLayer.addLayer(marker);
 }
 
 function searchNearby() {
-    if (!selectedCoords) return;
-    map.closePopup(); // Zamykamy menu kontekstowe
+  if (!selectedCoords) return;
+  map.closePopup(); // Zamykamy menu kontekstowe
 
-    var lat = selectedCoords.lat;
-    var lng = selectedCoords.lng;
-    var radius = 1000; // 1000 metrów
+  var lat = selectedCoords.lat;
+  var lng = selectedCoords.lng;
+  var radius = 1000; // 1000 metrów
 
-    markersLayer.clearLayers();
+  markersLayer.clearLayers();
 
-    var foundCount = 0;
-    
-    allEvents.forEach(event => {
-        if (!event.latitude || !event.longitude) return;
+  var foundCount = 0;
 
-        var eventLatLng = L.latLng(event.latitude, event.longitude);
-        var dist = eventLatLng.distanceTo(selectedCoords); 
+  allEvents.forEach(event => {
+    if (!event.latitude || !event.longitude) return;
 
-        if (dist <= radius) {
-            createMarker(event);
-            foundCount++;
-        }
-    });
+    var eventLatLng = L.latLng(event.latitude, event.longitude);
+    var dist = eventLatLng.distanceTo(selectedCoords);
 
-    var circle = L.circle(selectedCoords, {
-        radius: radius,
-        color: '#29526E',
-        fillColor: '#29526E',
-        fillOpacity: 0.1
-    });
-    resetButton.addTo(map);
-    markersLayer.addLayer(circle);
+    if (dist <= radius) {
+      createMarker(event);
+      foundCount++;
+    }
+  });
 
-    map.fitBounds(circle.getBounds());
+  var circle = L.circle(selectedCoords, {
+    radius: radius,
+    color: '#29526E',
+    fillColor: '#29526E',
+    fillOpacity: 0.1
+  });
+  resetButton.addTo(map);
+  markersLayer.addLayer(circle);
+
+  map.fitBounds(circle.getBounds());
 }
 
 function copyCoords() {
-    var text = `${selectedCoords.lat}, ${selectedCoords.lng}`;
-    navigator.clipboard.writeText(text).then(() => {
-        map.closePopup();
-    });
+  var text = `${selectedCoords.lat}, ${selectedCoords.lng}`;
+  navigator.clipboard.writeText(text).then(() => {
+    map.closePopup();
+  });
 }
 
-function updateMap() {    
-    fetch('/api/events/user')
-        .then(response => response.json())
-        .then(events => {
-            allEvents = events; 
-            markersLayer.clearLayers();
+var userEventsList = [];
 
-            events.forEach(event => {
-                createMarker(event);
-            });
-        })
-        .catch(err => console.error("Błąd pobierania eventów:", err));
+function updateMap() {
+  fetch('/api/events/user')
+    .then(response => response.json())
+    .then(events => {
+      allEvents = events;
+      markersLayer.clearLayers();
+
+      events.forEach(event => {
+        createMarker(event);
+      });
+    })
+    .catch(err => console.error("Błąd pobierania eventów:", err));
 }
 
 function vote(id, type) {
   fetch('/api/vote', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({event_id: id, vote: type})
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event_id: id, vote: type })
   }).then(res => res.json().then(d => {
-      if(d.new_score !== undefined) {
-          var el = document.getElementById('vote-count-'+id);
-          if(el) el.innerText = d.new_score;
-      } else { alert(d.error); }
+    if (d.new_score !== undefined) {
+      var el = document.getElementById('vote-count-' + id);
+      if (el) el.innerText = d.new_score;
+    } else { alert(d.error); }
   }));
 }
 
 updateMap();
 
 function deleteEvent(id) {
-  if(!confirm("Usunąć?")) return;
-  fetch('/api/delete_event/'+id, {method:'DELETE'})
-  .then(res => { 
-    if(res.ok) { 
-      if(existingMarkers[id]) {
-        markersLayer.removeLayer(existingMarkers[id]);
-        delete existingMarkers[id];
-        updateMap();
-      }
-    } else alert("Błąd usuwania"); 
-  });
+  if (!confirm("Usunąć?")) return;
+  fetch('/api/delete_event/' + id, { method: 'DELETE' })
+    .then(res => {
+      if (res.ok) {
+        if (existingMarkers[id]) {
+          markersLayer.removeLayer(existingMarkers[id]);
+          delete existingMarkers[id];
+          updateMap();
+        }
+      } else alert("Błąd usuwania");
+    });
 }
 
-var resetButton = L.control({position: 'bottomleft'});
+var resetButton = L.control({ position: 'bottomleft' });
 
-resetButton.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'reset-btn-container');
-    div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
-    return div;
+resetButton.onAdd = function(map) {
+  var div = L.DomUtil.create('div', 'reset-btn-container');
+  div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
+  return div;
 };
 
 function resetSearch() {
-    resetButton.remove(); 
-    isSearchActive = false;
-    
-    markersLayer.clearLayers();
-    existingMarkers = {}
-    updateMap(); // Wymuś pobranie wszystkiego
+  resetButton.remove();
+  isSearchActive = false;
+
+  markersLayer.clearLayers();
+  existingMarkers = {}
+  updateMap(); // Wymuś pobranie wszystkiego
 }
