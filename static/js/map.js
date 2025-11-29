@@ -68,6 +68,16 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
 });
 dzielnice.addTo(map);
 
+function toggleDzielnice() {
+  if (map.hasLayer(dzielnice)) {
+    map.removeLayer(dzielnice);
+  } else {
+    map.addLayer(dzielnice);
+  }
+}
+
+var eventsList = [];
+
 events.then(data => {
   data = data.entries();
   events_grouped = [];
@@ -79,9 +89,30 @@ events.then(data => {
       <br>Uczestnicy: ${event.usersGoing}<br>
       <a href="${event.url}" target="_blank">Link do wydarzenia</a>
       </div>`;
-    L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+    marker = L.marker([event.latitude, event.longitude]).addTo(map).bindPopup(popupContent);
+    eventsList.push(marker);
   })
 });
+
+function toggleEvents() {
+  eventsList.forEach(marker => {
+    if (map.hasLayer(marker)) {
+      map.removeLayer(marker);
+    } else {
+      map.addLayer(marker);
+    }
+  })
+};
+
+function toggleUserEvents() {
+  userEventsList.forEach(marker => {
+    if (map.hasLayer(marker)) {
+      map.removeLayer(marker);
+    } else {
+      map.addLayer(marker);
+    }
+  })
+};
 
 map.removeControl(map.zoomControl);
 
@@ -111,83 +142,89 @@ map.on('click', function(e) {
         <button onclick="copyCoords()">📋 Kopiuj współrzędne</button>
     </div>`;
 
-    L.popup()
-        .setLatLng(e.latlng)
-        .setContent(content)
-        .openOn(map);
+  if (is_popup_open) {
+    map.closePopup();
+    is_popup_open = false;
+    return;
+  }
+  is_popup_open = true;
+  L.popup()
+    .setLatLng(e.latlng)
+    .setContent(popupContent)
+    .openOn(map);
 });
 
 function openAddEventModal() {
-    if (!selectedCoords) return;
-    map.closePopup();
-    
-    document.getElementById('input-lat').value = selectedCoords.lat;
-    document.getElementById('input-lng').value = selectedCoords.lng;
-    document.getElementById('display-coords').innerText = 
-        selectedCoords.lat.toFixed(5) + ", " + selectedCoords.lng.toFixed(5);
-    
-    document.getElementById('eventModal').style.display = 'block';
+  if (!selectedCoords) return;
+  map.closePopup();
+
+  document.getElementById('input-lat').value = selectedCoords.lat;
+  document.getElementById('input-lng').value = selectedCoords.lng;
+  document.getElementById('display-coords').innerText =
+    selectedCoords.lat.toFixed(5) + ", " + selectedCoords.lng.toFixed(5);
+
+  document.getElementById('eventModal').style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('eventModal').style.display = 'none';
-    document.getElementById('addEventForm').reset();
+  document.getElementById('eventModal').style.display = 'none';
+  document.getElementById('addEventForm').reset();
 }
 
 document.getElementById('addEventForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    var formData = new FormData(this);
+  var formData = new FormData(this);
 
-    fetch('/api/add_event', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json().then(data => ({status: response.status, body: data})))
+  fetch('/api/add_event', {
+    method: 'POST',
+    body: formData
+  })
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
     .then(result => {
-        if (result.status === 201) {
-            closeModal();
-            updateMap();
-        } else {
-            alert("Błąd: " + (result.body.error || "Coś poszło nie tak"));
-            if (result.status === 401) {
-                window.location.href = "/login";
-            }
+      if (result.status === 201) {
+        closeModal();
+        updateMap();
+      } else {
+        alert("Błąd: " + (result.body.error || "Coś poszło nie tak"));
+        if (result.status === 401) {
+          window.location.href = "/login";
         }
+      }
     })
     .catch(err => {
-        console.error("Error:", err);
-        alert("Błąd połączenia z serwerem.");
+      console.error("Error:", err);
+      alert("Błąd połączenia z serwerem.");
     });
 });
 
 function createMarker(event) {
-    if (!event.latitude || !event.longitude) return;
+  if (!event.latitude || !event.longitude) return;
 
     var marker;
     var type = event.event_type || 'static'; 
 
-    if (type === 'live') {
-        var customIcon = L.divIcon({
-            className: 'pulsating-circle',
-            html: `<div></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]  
-        });
-        marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-    } else {
-        var customIcon = L.divIcon({
-            className: 'custom-icon-container',
-            html: `<div class="static-marker"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
-        marker = L.marker([event.latitude, event.longitude], {icon: customIcon});
-    }
-        
-    var deleteButtonHtml = '';
-    if (event.is_mine) {
-        deleteButtonHtml = `
+  if (type === 'live') {
+    var customIcon = L.divIcon({
+      className: 'pulsating-circle',
+      html: `<div></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+  } else {
+    var customIcon = L.divIcon({
+      className: 'custom-icon-container',
+      html: `<div class="static-marker"></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+  }
+
+  var deleteButtonHtml = '';
+  if (event.is_mine) {
+    deleteButtonHtml = `
             <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;">
                 <button onclick="deleteEvent(${event.id})" 
                         style="background:none; border:none; color:red; cursor:pointer; font-size:11px; text-decoration:underline;">
@@ -195,9 +232,9 @@ function createMarker(event) {
                 </button>
             </div>
         `;
-    }
+  }
 
-    var popupContent = `
+  var popupContent = `
         <div style="text-align:center; min-width:160px;">
             <strong style="font-size:14px;">${event.name}</strong><br>
             <span style="color:gray; font-size:11px;">${event['location.name']}</span>
@@ -228,65 +265,66 @@ function searchNearby() {
     var lng = selectedCoords.lng;
     var radius = 1000; // metry
 
-    markersLayer.clearLayers();
+  markersLayer.clearLayers();
 
-    var foundCount = 0;
-    
-    allEvents.forEach(event => {
-        if (!event.latitude || !event.longitude) return;
+  var foundCount = 0;
 
-        var eventLatLng = L.latLng(event.latitude, event.longitude);
-        var dist = eventLatLng.distanceTo(selectedCoords); 
+  allEvents.forEach(event => {
+    if (!event.latitude || !event.longitude) return;
 
-        if (dist <= radius) {
-            createMarker(event);
-            foundCount++;
-        }
-    });
+    var eventLatLng = L.latLng(event.latitude, event.longitude);
+    var dist = eventLatLng.distanceTo(selectedCoords);
 
-    var circle = L.circle(selectedCoords, {
-        radius: radius,
-        color: '#29526E',
-        fillColor: '#29526E',
-        fillOpacity: 0.1
-    });
-    resetButton.addTo(map);
-    markersLayer.addLayer(circle);
+    if (dist <= radius) {
+      createMarker(event);
+      foundCount++;
+    }
+  });
 
-    map.fitBounds(circle.getBounds());
+  var circle = L.circle(selectedCoords, {
+    radius: radius,
+    color: '#29526E',
+    fillColor: '#29526E',
+    fillOpacity: 0.1
+  });
+  resetButton.addTo(map);
+  markersLayer.addLayer(circle);
+
+  map.fitBounds(circle.getBounds());
 }
 
 function copyCoords() {
-    var text = `${selectedCoords.lat}, ${selectedCoords.lng}`;
-    navigator.clipboard.writeText(text).then(() => {
-        map.closePopup();
-    });
+  var text = `${selectedCoords.lat}, ${selectedCoords.lng}`;
+  navigator.clipboard.writeText(text).then(() => {
+    map.closePopup();
+  });
 }
 
-function updateMap() {
-    fetch('/api/events/user')
-        .then(response => response.json())
-        .then(events => {
-            allEvents = events; 
-            markersLayer.clearLayers();
-            markersById = {};
+var userEventsList = [];
 
-            events.forEach(event => {
-                createMarker(event);
-            });
-        })
-        .catch(err => console.error("Błąd pobierania eventów:", err));
+function updateMap() {
+  fetch('/api/events/user')
+    .then(response => response.json())
+    .then(events => {
+      allEvents = events;
+      markersLayer.clearLayers();
+
+      events.forEach(event => {
+        createMarker(event);
+      });
+    })
+    .catch(err => console.error("Błąd pobierania eventów:", err));
 }
 
 function vote(id, type) {
   fetch('/api/vote', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({event_id: id, vote: type})
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event_id: id, vote: type })
   }).then(res => res.json().then(d => {
-      if(d.new_score !== undefined) {
-          var el = document.getElementById('vote-count-'+id);
-          if(el) el.innerText = d.new_score;
-      } else { alert(d.error); }
+    if (d.new_score !== undefined) {
+      var el = document.getElementById('vote-count-' + id);
+      if (el) el.innerText = d.new_score;
+    } else { alert(d.error); }
   }));
 }
 
@@ -325,10 +363,10 @@ function deleteEvent(eventId) {
 }
 var resetButton = L.control({position: 'bottomleft'});
 
-resetButton.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'reset-btn-container');
-    div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
-    return div;
+resetButton.onAdd = function(map) {
+  var div = L.DomUtil.create('div', 'reset-btn-container');
+  div.innerHTML = '<button class="reset-control" onclick="resetSearch()">❌ Wyczyść filtr</button>';
+  return div;
 };
 
 function resetSearch() {

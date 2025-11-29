@@ -1,42 +1,26 @@
-
 <body>
-    <!-- Przycisk do otwierania okienka -->
-    <button id="openPanel"><i class="material-icons">home</i></button>
+    <button id="openPanel" onclick="toggleNav()"><i class="material-icons">menu</i></button>
 
-    <!-- Wysuwane okienko -->
     <div id="sidePanel" class="panel">
         <ul>
-            <div class="MenuHead">
-                <li><button id="closePanel" class="close-btn" onclick="closeNav()">&times;</button></li>
-                <li><h2>Cześć {{ current_user.username }}, to jest twój panel użytkownika!</h2></li>
+            <div class="navFrame">
+            <p>Wyświetlane warstwy:</p>
+            <label class="container">Zaludnienie dzielnic
+                <input type="checkbox" onclick="toggleDzielnice()" checked />
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Wydarzenia
+                <input type="checkbox" onclick="toggleEvents()" checked />
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Wydarzenia użytkowników
+                <input type="checkbox" onclick="toggleUserEvents()" checked />
+            <span class="checkmark"></span>
+            </label>
+
             </div>
-            
-            <h1>Checkboxes</h1>
-            <label class="container">One
-                <input type="checkbox" checked="checked" onclick="fuction1()">
-            <span class="checkmark"></span>
-            </label>
-
-            <label class="container">Two
-                <input type="checkbox" checked="checked" onclick="fuction2()">
-            <span class="checkmark"></span>
-            </label>
-
-            <label class="container">Three
-                <input type="checkbox" checked="checked" onclick="fuction3()">
-            <span class="checkmark"></span>
-            </label>
-
-            <label class="container">Four
-                <input type="checkbox" checked="checked" onclick="fuction4()">
-            <span class="checkmark"></span>
-            </label>
-
-            <label class="container">Five
-                <input type="checkbox" checked="checked" onclick="fuction5()">
-            <span class="checkmark"></span>
-            </label>
-
       </ul>
     </div>
 
@@ -66,8 +50,5 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/static/js/responses.js"></script>
     <script src="/static/js/chat.js"></script>
-    <!-- <script> -->
-    <!-- $('.sidePanel').sliiide({place: 'left', toggle: '#close-btn'}); -->
-    <!-- </script> -->
 </body>
 </html>

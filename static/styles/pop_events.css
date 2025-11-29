@@ -1,6 +1,6 @@
 .popup-menu {
-    text-align: center;
-    min-width: 150px;
+  text-align: center;
+  min-width: 150px;
 }
 
 .popup-menu button {
@@ -23,11 +23,7 @@
 }
 
 .popup-menu button.btn-add {
-    font-weight: bold;
-}
-
-.popup-menu button.btn-search {
-    
+  font-weight: bold;
 }
 
 .pulsating-circle {
