@@ -1,5 +1,6 @@
 const map = L.map('map').setView([54.4000, 18.5000], 11);
 var markersLayer = L.layerGroup().addTo(map);
+map.removeControl(map.zoomControl);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -13,52 +14,39 @@ async function fetchEvents() {
 }
 
 var events = fetchEvents();
-
+var clickedDistrictInfo = null;
 var layers = [];
+var markersById = {};
 
 var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
-  onEachFeature: function(feature, layer) {
-    var holder = [];
-    // for (var key in feature.properties) {
-    //   holder.push(key + ": " + feature.properties[key] + "<br>");
-    //   popupContent = holder.join("");
-    //   layer.bindPopup(popupContent); // DO KLIKNIECIA
-    // };
-    liczba_mieszkancow = feature.properties.L_MIESZK;
-    if (liczba_mieszkancow > 20000) {
-      layer.setStyle({fillColor: "#FF0000"});
-    } else if (liczba_mieszkancow > 15000) {
-      layer.setStyle({fillColor: "#FF7F00"});
-    } else if (liczba_mieszkancow > 10000) {
-      layer.setStyle({fillColor: "#FFFF00"});
-    } else if (liczba_mieszkancow > 5000) {
-      layer.setStyle({fillColor: "#7FFF00"});
-    } else {
-      layer.setStyle({fillColor: "#00FF00"});
-    }
-    liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: " + liczba_mieszkancow.toString() + "<br>";
-    if (liczba_mieszkancow == null) {
-      liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: Brak danych<br>";
-    }
-    if (liczba_mieszkancow == 0) {
-      liczba_mieszkancow_text = "<br><b>Liczba mieszkańców</b>: Brak danych<br>";
-    }
-      
-    popupContent = "<div id='popup'><b>Dzielnica:</b> " + feature.properties.DZIELNICY + liczba_mieszkancow_text + "</div>";
+    onEachFeature: function(feature, layer) {
+        var l_m = feature.properties.L_MIESZK;
+        var color = "#00FF00";
+        if (l_m > 20000) color = "#FF0000";
+        else if (l_m > 15000) color = "#FF7F00";
+        else if (l_m > 10000) color = "#FFFF00";
+        else if (l_m > 5000) color = "#7FFF00";
 
-    layer.bindPopup(popupContent); // DO KLIKNIECIA
-    layers.push(layer);
-    // console.log("adding to map")
-  },
-  style: function(feature) {
-    return {
-      color: "#29526E",
-      fillOpacity: 0.5,
+        layer.setStyle({
+            fillColor: color,
+            color: "#29526E",
+            weight: 1,
+            fillOpacity: 0.3
+        });
+
+        layer.on('click', function(e) {
+            var popText = (l_m > 0) ? l_m.toString() : "Brak danych";
+            clickedDistrictInfo = `
+                <div style="background:#f0f8ff; padding:5px; border-radius:4px; margin-bottom:5px; border:1px solid #ccc;">
+                    <b>Dzielnica: ${feature.properties.DZIELNICY}</b><br>
+                    Mieszkańców: ${popText}
+                </div>
+            `;
+            
+        });
     }
-  },
 });
 dzielnice.addTo(map);
-
 
 events.then(data => {
   data = data.entries();
@@ -83,43 +71,29 @@ var is_popup_open = false;
 var allEvents = []; // Przechowuje wszystkie zdarzenia
 var existingMarkers = {};
 
-// OBSŁUGA KLIKNIĘCIA NA MAPIE
 map.on('click', function(e) {
-    selectedCoords = e.latlng; // Zapisujemy kliknięte współrzędne
+    selectedCoords = e.latlng;
     
-    var lat = selectedCoords.lat.toFixed(5);
-    var lng = selectedCoords.lng.toFixed(5);
-
-    // Tworzymy HTML dla menu w dymku
-    var popupContent = `
-        <div class="popup-menu">
-            <div style="font-size:11px; color:#888; margin-bottom:5px;">
-                ${lat}, ${lng}
-            </div>
-            
-            <button class="btn-add" onclick="openAddEventModal()">
-                ➕ Dodaj zdarzenie
-            </button>
-            
-            <button class="btn-search" onclick="searchNearby()">
-                🔍 Szukaj w promieniu 1km
-            </button>
-
-             <button onclick="copyCoords()">
-                📋 Kopiuj współrzędne
-            </button>
-        </div>
-    `;
-
-    if (is_popup_open) {
-        map.closePopup();
-        is_popup_open = false;
-        return;
+    var content = '<div class="popup-menu">';
+    
+    if (clickedDistrictInfo) {
+        content += clickedDistrictInfo;
+        clickedDistrictInfo = null;
     }
-    is_popup_open = true;
+
+    var lat = e.latlng.lat.toFixed(5);
+    var lng = e.latlng.lng.toFixed(5);
+    content += `<div style="font-size:10px; color:#888; margin:5px 0;">${lat}, ${lng}</div>`;
+
+    content += `
+        <button class="btn-add" onclick="openAddEventModal()">➕ Dodaj zdarzenie</button>
+        <button class="btn-search" onclick="searchNearby()">🔍 Szukaj w promieniu 1km</button>
+        <button onclick="copyCoords()">📋 Kopiuj współrzędne</button>
+    </div>`;
+
     L.popup()
         .setLatLng(e.latlng)
-        .setContent(popupContent)
+        .setContent(content)
         .openOn(map);
 });
 
@@ -171,7 +145,6 @@ function createMarker(event) {
     if (!event.latitude || !event.longitude) return;
 
     var marker;
-
     var type = event.event_type || 'static'; 
 
     if (type === 'live') {
@@ -209,16 +182,13 @@ function createMarker(event) {
             <strong style="font-size:14px;">${event.name}</strong><br>
             <span style="color:gray; font-size:11px;">${event['location.name']}</span>
             <hr style="margin:5px 0;">
-            
             <div style="margin-bottom:5px;">
                 Głosów: <b id="vote-count-${event.id}">${event.upvoteCount || 0}</b>
             </div>
-            
             <div>
                 <button onclick="vote(${event.id}, 'up')" style="cursor:pointer; background:#d4edda; border:1px solid #c3e6cb; padding:2px 8px; border-radius:4px;">👍</button>
                 <button onclick="vote(${event.id}, 'down')" style="cursor:pointer; background:#f8d7da; border:1px solid #f5c6cb; padding:2px 8px; border-radius:4px;">👎</button>
             </div>
-
             ${deleteButtonHtml}
         </div>
     `;
@@ -226,15 +196,17 @@ function createMarker(event) {
     marker.bindPopup(popupContent);
     
     markersLayer.addLayer(marker);
+    
+    markersById[event.id] = marker; 
 }
 
 function searchNearby() {
     if (!selectedCoords) return;
-    map.closePopup(); // Zamykamy menu kontekstowe
+    map.closePopup();
 
     var lat = selectedCoords.lat;
     var lng = selectedCoords.lng;
-    var radius = 1000; // 1000 metrów
+    var radius = 1000; // metry
 
     markersLayer.clearLayers();
 
@@ -271,12 +243,13 @@ function copyCoords() {
     });
 }
 
-function updateMap() {    
+function updateMap() {
     fetch('/api/events/user')
         .then(response => response.json())
         .then(events => {
             allEvents = events; 
             markersLayer.clearLayers();
+            markersById = {};
 
             events.forEach(event => {
                 createMarker(event);
@@ -299,20 +272,37 @@ function vote(id, type) {
 
 updateMap();
 
-function deleteEvent(id) {
-  if(!confirm("Usunąć?")) return;
-  fetch('/api/delete_event/'+id, {method:'DELETE'})
-  .then(res => { 
-    if(res.ok) { 
-      if(existingMarkers[id]) {
-        markersLayer.removeLayer(existingMarkers[id]);
-        delete existingMarkers[id];
-        updateMap();
-      }
-    } else alert("Błąd usuwania"); 
-  });
-}
+function deleteEvent(eventId) {
+    if (!confirm("Czy na pewno chcesz usunąć to zgłoszenie? Tego nie da się cofnąć.")) {
+        return;
+    }
 
+    map.closePopup();
+
+    fetch(`/api/delete_event/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => {
+        if (res.status === 200) {
+            if (markersById[eventId]) {
+                markersLayer.removeLayer(markersById[eventId]);
+                delete markersById[eventId];
+            }
+            updateMap(); 
+        } else {
+            res.json().then(data => {
+                alert("Błąd: " + (data.error || "Nie udało się usunąć."));
+            });
+        }
+    })
+    .catch(err => {
+        console.error("Błąd sieci:", err);
+        alert("Wystąpił błąd połączenia.");
+    });
+}
 var resetButton = L.control({position: 'bottomleft'});
 
 resetButton.onAdd = function (map) {
@@ -327,5 +317,6 @@ function resetSearch() {
     
     markersLayer.clearLayers();
     existingMarkers = {}
-    updateMap(); // Wymuś pobranie wszystkiego
+    updateMap();
 }
+
