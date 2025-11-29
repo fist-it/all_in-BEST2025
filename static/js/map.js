@@ -1,4 +1,8 @@
-const map = L.map('map').setView([54.4000, 18.5000], 11);
+const map = L.map('map').setView([54.372158, 18.638306], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 var markersLayer = L.layerGroup().addTo(map);
 map.removeControl(map.zoomControl);
 
@@ -20,7 +24,6 @@ var markersById = {};
 
 var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
     onEachFeature: function(feature, layer) {
-        // Stylizacja
         var l_m = feature.properties.L_MIESZK;
         var color = "#00FF00";
         if (l_m > 20000) color = "#FF0000";
@@ -35,11 +38,9 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
             fillOpacity: 0.3
         });
 
-        // Obsługa kliknięcia (BEZ bindPopup - tylko obliczenia)
         layer.on('click', function(e) {
             var eventsInDistrict = 0;
             
-            // Zliczamy eventy w tej konkretnej dzielnicy
             allEvents.forEach(ev => {
                 if(ev.latitude && ev.longitude) {
                     if (isMarkerInsidePolygon(ev.latitude, ev.longitude, layer)) {
@@ -51,7 +52,6 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
             var popText = (l_m > 0) ? l_m.toString() : "Brak danych";
             var eventCountColor = eventsInDistrict > 0 ? "red" : "gray";
             
-            // Zapisujemy HTML do zmiennej globalnej
             clickedDistrictInfo = `
                 <div style="background:#f0f8ff; padding:8px; border-radius:4px; margin-bottom:5px; border:1px solid #ccc; font-family: sans-serif;">
                     <div style="font-size:14px; font-weight:bold; color:#29526E; margin-bottom:4px;">
@@ -63,7 +63,6 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
                     </div>
                 </div>
             `;
-            // Propagacja leci dalej do mapy...
         });
     }
 });
