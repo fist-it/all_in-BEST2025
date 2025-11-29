@@ -212,6 +212,7 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+    userEventsList.push(marker);
   } else {
     var customIcon = L.divIcon({
       className: 'custom-icon-container',
@@ -220,6 +221,7 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+    userEventsList.push(marker);
   }
 
   var deleteButtonHtml = '';
