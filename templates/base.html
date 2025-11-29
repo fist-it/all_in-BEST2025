@@ -19,9 +19,17 @@
 <body>
     <nav class="navbar">
         <ul class="menu">
-            <div style="position: absolute ;left: 15px" >
-       <li id="userMenu">{% include 'menu.html' %}</li>
-                  </div>
+            {% if current_user.username == "admin" %}
+        <div style="position: absolute ;left: 15px" >
+       <li id="userMenu">{% include 'menu_admin.html' %}</li>
+        </div>
+
+            {% else %}
+        <div style="position: absolute ;left: 15px" >
+            <li id="userMenu">{% include 'menu.html' %}</li>
+        </div>
+            {% endif %}
+
         <div class="collapse navbar-collapse">
 
                 <li><h2>BEST2025</h2></li>
@@ -52,4 +60,5 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
