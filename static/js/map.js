@@ -59,6 +59,13 @@ var dzielnice = new L.Shapefile('/static/data/dzielnice.zip', {
 });
 dzielnice.addTo(map);
 
+function toggleDzielnice() {
+  if (map.hasLayer(dzielnice)) {
+    map.removeLayer(dzielnice);
+  } else {
+    map.addLayer(dzielnice);
+  }
+}
 
 events.then(data => {
   data = data.entries();
