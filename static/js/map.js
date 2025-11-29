@@ -31,7 +31,6 @@ events.then(data => {
 }); 
 // L.Shapefile('/static/data/dzielnice.zip').addTo(map);
 
-
 events.then(data => {
   data = data.entries();
   console.log(data)
@@ -54,6 +53,8 @@ map.removeControl(map.zoomControl);
 // ostatnie wybrane coordy
 var selectedCoords = null;
 var is_popup_open = false;
+var allEvents = []; // Przechowuje wszystkie zdarzenia
+var existingMarkers = {};
 
 // OBSŁUGA KLIKNIĘCIA NA MAPIE
 map.on('click', function(e) {
@@ -138,8 +139,6 @@ document.getElementById('addEventForm').addEventListener('submit', function(e) {
         alert("Błąd połączenia z serwerem.");
     });
 });
-
-
 
 function createMarker(event) {
     if (!event.latitude || !event.longitude) return;
@@ -228,8 +227,8 @@ function searchNearby() {
 
     var circle = L.circle(selectedCoords, {
         radius: radius,
-        color: '#007bff',
-        fillColor: '#007bff',
+        color: '#29526E',
+        fillColor: '#29526E',
         fillOpacity: 0.1
     });
     resetButton.addTo(map);
@@ -241,15 +240,12 @@ function searchNearby() {
 function copyCoords() {
     var text = `${selectedCoords.lat}, ${selectedCoords.lng}`;
     navigator.clipboard.writeText(text).then(() => {
-        alert("Skopiowano: " + text);
         map.closePopup();
     });
 }
 
-function updateMap() {
-    console.log("Odświeżam mapę...");
-    
-    fetch('/api/events/user') 
+function updateMap() {    
+    fetch('/api/events/user')
         .then(response => response.json())
         .then(events => {
             allEvents = events; 
@@ -262,54 +258,32 @@ function updateMap() {
         .catch(err => console.error("Błąd pobierania eventów:", err));
 }
 
-function vote(eventId, type) {
-    fetch('/api/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event_id: eventId, vote: type })
-    })
-    .then(res => res.json().then(data => ({ status: res.status, body: data })))
-    .then(result => {
-        if (result.status === 200) {
-            var counterEl = document.getElementById(`vote-count-${eventId}`);
-            if (counterEl) {
-                counterEl.innerText = result.body.new_score;
-                counterEl.style.color = type === 'up' ? 'green' : 'red';
-                setTimeout(() => counterEl.style.color = 'black', 1000);
-            }
-        } else {
-            alert(result.body.error || "Wystąpił błąd podczas głosowania.");
-        }
-    })
-    .catch(err => console.error("Network error:", err));
+function vote(id, type) {
+  fetch('/api/vote', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({event_id: id, vote: type})
+  }).then(res => res.json().then(d => {
+      if(d.new_score !== undefined) {
+          var el = document.getElementById('vote-count-'+id);
+          if(el) el.innerText = d.new_score;
+      } else { alert(d.error); }
+  }));
 }
 
 updateMap();
 
-function deleteEvent(eventId) {
-    if (!confirm("Czy na pewno chcesz usunąć to zgłoszenie? Tego nie da się cofnąć.")) {
-        return;
-    }
-
-    fetch(`/api/delete_event/${eventId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(res => {
-        if (res.status === 200) {       
-            updateMap(); 
-        } else {
-            res.json().then(data => {
-                alert("Błąd: " + (data.error || "Nie udało się usunąć."));
-            });
-        }
-    })
-    .catch(err => {
-        console.error("Błąd sieci:", err);
-        alert("Wystąpił błąd połączenia.");
-    });
+function deleteEvent(id) {
+  if(!confirm("Usunąć?")) return;
+  fetch('/api/delete_event/'+id, {method:'DELETE'})
+  .then(res => { 
+    if(res.ok) { 
+      if(existingMarkers[id]) {
+        markersLayer.removeLayer(existingMarkers[id]);
+        delete existingMarkers[id];
+        updateMap();
+      }
+    } else alert("Błąd usuwania"); 
+  });
 }
 
 var resetButton = L.control({position: 'bottomleft'});
@@ -321,7 +295,10 @@ resetButton.onAdd = function (map) {
 };
 
 function resetSearch() {
-    resetButton.remove();
-  
-    updateMap();
+    resetButton.remove(); 
+    isSearchActive = false;
+    
+    markersLayer.clearLayers();
+    existingMarkers = {}
+    updateMap(); // Wymuś pobranie wszystkiego
 }
