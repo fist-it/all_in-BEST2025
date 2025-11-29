@@ -150,7 +150,7 @@ map.on('click', function(e) {
   is_popup_open = true;
   L.popup()
     .setLatLng(e.latlng)
-    .setContent(popupContent)
+    .setContent(content)
     .openOn(map);
 });
 
