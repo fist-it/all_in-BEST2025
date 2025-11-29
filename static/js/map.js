@@ -77,7 +77,6 @@ function toggleDzielnice() {
 }
 
 var eventsList = [];
-
 events.then(data => {
   data = data.entries();
   events_grouped = [];
@@ -198,6 +197,7 @@ document.getElementById('addEventForm').addEventListener('submit', function(e) {
     });
 });
 
+var userEventsList = [];
 function createMarker(event) {
   if (!event.latitude || !event.longitude) return;
 
@@ -212,6 +212,7 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+    userEventsList.push(marker);
   } else {
     var customIcon = L.divIcon({
       className: 'custom-icon-container',
@@ -220,6 +221,7 @@ function createMarker(event) {
       iconAnchor: [10, 10]
     });
     marker = L.marker([event.latitude, event.longitude], { icon: customIcon });
+    userEventsList.push(marker);
   }
 
   var deleteButtonHtml = '';
@@ -300,7 +302,6 @@ function copyCoords() {
   });
 }
 
-var userEventsList = [];
 
 function updateMap() {
   fetch('/api/events/user')
