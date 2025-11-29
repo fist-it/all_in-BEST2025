@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/pop_events.css" >
     <link rel="stylesheet" href="/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <style>
         body { margin: 0; font-family: sans-serif; }
     </style>
@@ -48,30 +48,30 @@
     <div class="container-fluid">
         {% block content %}{% endblock %}
     </div>
-    <div id="eventModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+    <div id="eventModal" class="eventor">
         <div style="background:white; max-width:400px; margin:100px auto; padding:20px; border-radius:8px;">
-            <h3>Nowe Zgłoszenie</h3>
-            <p>Lokalizacja: <span id="display-coords" style="color:#666;"></span></p>
+            <h3 class="zglosz">Nowe Zgłoszenie</h3>
+            <p>Lokalizacja: <span id="display-coords" style="color:#90876c;"></span></p>
 
             <form id="addEventForm">
                 <input type="hidden" id="input-lat" name="latitude">
                 <input type="hidden" id="input-lng" name="longitude">
 
-                <label>Tytuł:</label>
-                <input type="text" name="title" required placeholder="Co się dzieje?" style="width:100%; margin-bottom:10px;">
-
-                <label>Typ:</label>
-                <select name="type" style="width:100%; margin-bottom:10px;">
+                <label>Tytuł:</label><br>
+                <input type="text" name="title" required placeholder="Co się dzieje?" class="but-form">
+                    <br>
+                    <label>Typ:</label><br>
+                <select name="type" class="but-form">
                     <option value="live">LIVE (Zdarzenie)</option>
                     <option value="static">STATIC (Miejsce)</option>
                 </select>
-
-                <label>Opis (opcjonalne):</label>
-                <input type="text" name="location_name" placeholder="np. Koło fontanny" style="width:100%; margin-bottom:20px;">
-
+                     <br>
+                <label>Opis (opcjonalne):</label><br>
+                <input type="text" name="location_name" placeholder="np. Koło fontanny" class="but-form">
+                     <br>
                 <div style="text-align:right;">
-                    <button type="button" onclick="closeModal()">Anuluj</button>
-                    <button type="submit" style="background-color:#98c9bd; color:black;">Wyślij zgłoszenie</button>
+                    <button type="button" onclick="closeModal()" class="but">Anuluj</button>
+                    <button type="submit" class="but">Wyślij zgłoszenie</button>
                 </div>
             </form>
         </div>

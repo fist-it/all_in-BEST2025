@@ -1,5 +1,8 @@
+*{
+   font-family:'Inter';
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -272,4 +275,57 @@ z-index: 1000;
 .menuHead{
   overflow: hidden;
   color: #212a53;
+}
+
+.eventor {
+  display:none; 
+  position:fixed; 
+  top:0; 
+  left:0; 
+  width:100%; 
+  height:100%; 
+  background:rgba(0,0,0,0.5); 
+  z-index:9999;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.but {
+    background-color: #3d6483;
+    transition: background-color 300ms ease;
+    color: #fff;
+    border: none;
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 75px;
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.but:hover {
+    background-color: #212a53;
+}
+
+.but-form {
+  width:200px; 
+  height: 30px;
+  margin-bottom:20px;
+  transform-style:preserve-3d;
+  color: #212a53;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.zglosz{
+  color:#494435;
+	font-size: 25px ;  
+	font-weight: 900;
+    transition: color 300ms ease;
 }
