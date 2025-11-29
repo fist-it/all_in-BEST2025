@@ -1,6 +1,6 @@
 {
-  "Kultura_quantity": "124",
-  "Sport_quantity": "15",
-  "Rozrywka_quantity": "43",
-  "Inne_quantity": "36"
+  "Kultura_quantity": "78",
+  "Sport_quantity": "19",
+  "Rozrywka_quantity": "31",
+  "Inne_quantity": "27"
 }
