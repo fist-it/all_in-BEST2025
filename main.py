@@ -24,7 +24,7 @@ except Exception as e:
 
 def main():
     #w trybie developerskim
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0')
 
 def load_facebook_events(nazwa_pliku="dane.json"):
     if not os.path.exists(nazwa_pliku):
