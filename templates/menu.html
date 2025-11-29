@@ -1,0 +1,53 @@
+<body>
+    <button id="openPanel" onclick="toggleNav()"><i class="material-icons">layers</i></button>
+
+    <div id="sidePanel" class="panel">
+        <ul>
+            <div class="navFrame">
+            <p>Wyświetlane warstwy:</p>
+            <label class="container">Zaludnienie dzielnic
+                <input type="checkbox" onclick="toggleDzielnice()" checked />
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Wydarzenia
+                <input type="checkbox" onclick="toggleEvents()" checked />
+            <span class="checkmark"></span>
+            </label>
+
+            <label class="container">Wydarzenia użytkowników
+                <input type="checkbox" onclick="toggleUserEvents()" checked />
+            <span class="checkmark"></span>
+            </label>
+            </div>
+      </ul>
+    </div>
+
+     <!-- CHAT BAR BLOCK -->
+    <div class="chat-box collapsed init" style="height: 70px;">
+        <div class="chat-header"> <div class="chat-right-header"> 
+                <i class="material-icons" id="chaticon">chat_bubble</i>
+                Chatbot
+        </div>
+            <button id="toggle-chat-btn" onclick="toggleChat()" title="Zwiń/Rozwiń">
+                <i class="material-icons">keyboard_arrow_up</i>
+            </button>
+        </div>
+        
+        <div class="chat-content">
+            <div class="chating" id="chat-messages">
+                <p><strong>AI:</strong> Cześć, na jakie wydarzenie w Gdańsku chciałbyś się wybrać?</p>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Wpisz pytanie...">
+                <button class="sendbtn" onclick="sendMessage()"><i class="material-icons">send</i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/static/js/responses.js"></script>
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Flask
+Flask-Login
+Werkzeug
+requests
+google-genai
+gunicorn
+flask-sqlalchemy
+geopy

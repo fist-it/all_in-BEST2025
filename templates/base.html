@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart City Panel{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/styles.css" >
+    <link rel="stylesheet" type="text/css" href="/static/styles/chat.css" >
+    <link rel="stylesheet" type="text/css" href="/static/styles/home.css" >
+    <link rel="stylesheet" type="text/css" href="/static/styles/pop_events.css" >
+    <link rel="stylesheet" href="/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="menu">
+            {% if current_user.username == "admin" %}
+        <div style="position: absolute ;left: 15px" >
+       <li id="userMenu">{% include 'menu_admin.html' %}</li>
+        </div>
+
+            {% else %}
+        <div style="position: absolute ;left: 15px" >
+            <li id="userMenu">{% include 'menu.html' %}</li>
+        </div>
+            {% endif %}
+
+        <div class="collapse navbar-collapse">
+
+                <li><h2>ALL City Map Gdańsk</h2></li>
+
+
+                {% if current_user.is_authenticated %}
+                    <li>
+                        <a href="{{ url_for('logout') }}">
+                        <button class="nav-link" id="link1">
+                            <i class="material-icons">logout</i>
+                        </button>
+                        </a>
+                    </li>
+
+                    <li><span id="link2">Witaj, {{ current_user.username }}</span></li>                    
+
+                    {% else %}
+                    <li><a class="nav-link" href="{{ url_for('login') }}" id="link1">Zaloguj</a></li>
+                    <li><a class="nav-link" href="{{ url_for('register') }}" id="link2">Zarejestruj</a></li>
+                {% endif %}
+        </div>
+        </ul>
+    </nav>
+    <div class="container-fluid">
+        {% block content %}{% endblock %}
+    </div>
+    <div id="eventModal" class="eventor">
+        <div style="background:white; max-width:400px; margin:100px auto; padding:20px; border-radius:8px;">
+            <h3 class="zglosz">Nowe Zgłoszenie</h3>
+            <p>Lokalizacja: <span id="display-coords" style="color:#90876c;"></span></p>
+
+            <form id="addEventForm">
+                <input type="hidden" id="input-lat" name="latitude">
+                <input type="hidden" id="input-lng" name="longitude">
+
+                <label>Tytuł:</label><br>
+                <input type="text" name="title" required placeholder="Co się dzieje?" class="but-form">
+                    <br>
+                    <label>Typ:</label><br>
+                <select name="type" class="but-form">
+                    <option value="live">LIVE (Zdarzenie)</option>
+                    <option value="static">STATIC (Miejsce)</option>
+                </select>
+                     <br>
+                <label>Opis (opcjonalne):</label><br>
+                <input type="text" name="location_name" placeholder="np. Koło fontanny" class="but-form">
+                     <br>
+                <div style="text-align:right;">
+                    <button type="button" onclick="closeModal()" class="but">Anuluj</button>
+                    <button type="submit" class="but">Wyślij zgłoszenie</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+
+</html>
