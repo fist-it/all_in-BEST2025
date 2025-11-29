@@ -5,3 +5,4 @@ requests
 google-genai
 gunicorn
 flask-sqlalchemy
+geopy
