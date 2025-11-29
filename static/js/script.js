@@ -14,3 +14,12 @@ openPanelButton.addEventListener('click', () => {
 closePanelButton.addEventListener('click', () => {
     sidePanel.classList.remove('open');
 });
+
+function openNav() {
+    document.getElementById("sidePanel").style.width = "250px";
+    document.getElementById("sidePanel").style.left = "0px";
+}
+function closeNav() {
+    document.getElementById("sidePanel").style.width = "0px";
+    document.getElementById("sidePanel").style.left = "-200px";
+}

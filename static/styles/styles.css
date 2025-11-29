@@ -185,11 +185,31 @@ z-index: 1000;
 
   #sidePanel{
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0; 
+      left: -200px;
+      background-color: #f4f4f4;
+      overflow-x: hidden; 
+      padding-top: 60px; 
+      transition: 1.5s;
   }
+
+   #sidePanel a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
 
   #openPanel{
     position: relative;
     top: -2px;
+    left: -30px;
   }
 
 .container {
